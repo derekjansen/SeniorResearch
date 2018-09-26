@@ -32,7 +32,10 @@ public class JavaExamples_run_mission
 {
     static
     {
-        System.loadLibrary("MalmoJava"); // attempts to load MalmoJava.dll (on Windows) or libMalmoJava.so (on Linux)
+        //System.loadLibrary("MalmoJava"); // attempts to load MalmoJava.dll (on Windows) or libMalmoJava.so (on Linux)
+        
+        //NEED TO SET ENVIRONMENT VARIABLES
+        System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib");  //think this might work
     }
 
     public static void main(String argv[])
@@ -58,9 +61,9 @@ public class JavaExamples_run_mission
             System.out.println( agent_host.getUsage() );
             System.exit(0);
         }
-
+        
         MissionSpec my_mission = new MissionSpec();
-        my_mission.timeLimitInSeconds(10);
+        my_mission.timeLimitInSeconds(60000);
         my_mission.requestVideo( 800, 600 );
         my_mission.rewardForReachingPosition(19.5f,0.0f,19.5f,100.0f,1.1f);
 
