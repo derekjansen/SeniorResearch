@@ -24,7 +24,7 @@ public class Genome {
      * ADD CONNECTION GENE
      * @param r 
      */
-    public void addConnectionMutation(Random r){
+    public void addConnectionMutation(Random r, InnovationGenerator innovation){
         //pick two random nodes 
         NodeGene node1 = nodes.get(r.nextInt(nodes.size()));
         NodeGene node2 = nodes.get(r.nextInt(nodes.size()));
@@ -72,7 +72,7 @@ public class Genome {
      * ADD NODE GENE
      * @param r 
      */
-    public void addNodeMutation(Random r){
+    public void addNodeMutation(Random r, InnovationGenerator innovation){
         ConnectionGene con = connections.get(r.nextInt(connections.size()));
         
         NodeGene inNode = nodes.get(con.getInNode());
@@ -83,8 +83,8 @@ public class Genome {
         
         
         NodeGene newNode = new NodeGene(TYPE.HIDDEN,nodes.size());
-        ConnectionGene newIn = new ConnectionGene(inNode.getId(),newNode.getId(),1f,true,0);
-        ConnectionGene newOut = new ConnectionGene(newNode.getId(),outNode.getId(),con.getWeight(),true,0);
+        ConnectionGene newIn = new ConnectionGene(inNode.getId(),newNode.getId(),1f,true, innovation.getInnovation());
+        ConnectionGene newOut = new ConnectionGene(newNode.getId(),outNode.getId(),con.getWeight(),true, innovation.getInnovation());
         
         nodes.add(newNode);
         connections.add(newIn);
