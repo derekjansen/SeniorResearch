@@ -15,6 +15,9 @@ public class Genome {
     private Map<Integer,ConnectionGene> connections;
     private Map<Integer,NodeGene> nodes;
     
+    //dont use this yet but could then... 
+    private InnovationGenerator InnoGen;
+    
     //constructor
     public Genome(){
         super();
@@ -141,7 +144,7 @@ public class Genome {
      * @param r
      * @return 
      */
-    public Genome crossover(Genome parent1, Genome parent2, Random r)
+    public static Genome crossover(Genome parent1, Genome parent2, Random r)
     {
         
         Genome child = new Genome();
@@ -166,6 +169,11 @@ public class Genome {
             }
         }
         return child;
+    }
+    
+    
+    public void changeWeightMutation(){
+        
     }
     
     

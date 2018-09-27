@@ -7,7 +7,7 @@ package neat;
  */
 public class NodeGene {
     
-    enum TYPE{
+    public enum TYPE{
         INPUT,
         HIDDEN,
         OUTPUT;

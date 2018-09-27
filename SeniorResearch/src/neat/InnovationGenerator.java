@@ -2,15 +2,15 @@
 package neat;
 
 /**
- *
+ * 
  * @author derekgrove
  */
 public class InnovationGenerator {
     
-    //HOW to make this work...
+    private int currentInnovation = 0;
     
     public int assignNewInnovation(){
-        return 0;
+        return currentInnovation++;
     }
     
     
