@@ -2,7 +2,6 @@
 package neat;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import neat.NodeGene.TYPE;
@@ -62,6 +61,7 @@ public class Genome {
     /**
      * ADD ConnectionGene Mutation
      * @param r 
+     * @param innovation 
      */
     public void addConnectionMutation(Random r, InnovationGenerator innovation){
         //pick two random nodes 
@@ -111,6 +111,7 @@ public class Genome {
     /**
      * Add NodeGene Mutation
      * @param r 
+     * @param innovation 
      */
     public void addNodeMutation(Random r, InnovationGenerator innovation){
         //grab a ranom connection gene
@@ -137,9 +138,10 @@ public class Genome {
      * *** ASSUMES PARENT ONE IS MORE FIT
      * @param parent1
      * @param parent2
+     * @param r
      * @return 
      */
-    public Genome crossover(Genome parent1, Genome parent2)
+    public Genome crossover(Genome parent1, Genome parent2, Random r)
     {
         
         Genome child = new Genome();
@@ -154,18 +156,17 @@ public class Genome {
         for(ConnectionGene p1Connect: parent1.getConnectionGenes().values()){
             if(parent2.getConnectionGenes().containsKey(p1Connect.getInnovationNumber())){ //matching
                
-                //randomly copy from one or the other parent
-                
+                //Clever line... if the random boolean is true, copy the parent 1 gene, else copy parent 2
+                ConnectionGene childConnection = r.nextBoolean() ? p1Connect.copy() : parent2.getConnectionGenes().get(p1Connect.getInnovationNumber()).copy();
+                child.addConnectionGene(childConnection);
                 
             }else{ //disjoint or excess
                 //copy all from fit parent
                 child.addConnectionGene(p1Connect.copy());
             }
         }
-        
-        return null;
+        return child;
     }
-    
     
     
 }
