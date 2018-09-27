@@ -1,7 +1,9 @@
 
 package neat;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import neat.NodeGene.TYPE;
 
@@ -11,17 +13,54 @@ import neat.NodeGene.TYPE;
  */
 public class Genome {
     
-    private List<ConnectionGene> connections;
-    private List<NodeGene> nodes;
+    private Map<Integer,ConnectionGene> connections;
+    private Map<Integer,NodeGene> nodes;
     
     //constructor
     public Genome(){
         super();
+        nodes = new HashMap();
+        connections = new HashMap();
+    }
+    
+    /**
+     * Adds a ConnectionGene into the Genome's connection list
+     * @param connectionToAdd 
+     */
+    public void addConnectionGene(ConnectionGene connectionToAdd){
+        connections.put(connectionToAdd.getInnovationNumber(),connectionToAdd);
+    }
+    
+    /**
+     * Adds a NodeGene to the Genomes node list, placed in the index based on id
+     * @param nodeToAdd 
+     */
+    public void addNodeGene(NodeGene nodeToAdd){
+        nodes.put(nodeToAdd.getId(), nodeToAdd);
+    }
+    
+    /**
+     * Retrieve the Genome's list of NodeGenes
+     * @return 
+     */
+    public Map<Integer,NodeGene> getNodeGenes(){
+        return nodes;
+    }
+    
+    /**
+     * Retrieve the Genome's list of ConnectionGenes
+     * @return 
+     */
+    public Map<Integer,ConnectionGene> getConnectionGenes(){
+        return connections;
     }
     
     
+    ////////////////////MUTATIONS///////////////////////
+    
+    
     /**
-     * ADD CONNECTION GENE
+     * ADD ConnectionGene Mutation
      * @param r 
      */
     public void addConnectionMutation(Random r, InnovationGenerator innovation){
@@ -43,7 +82,7 @@ public class Genome {
         
         //checks to make sure the connection isnt already made
         boolean connectionExists = false;
-        for(ConnectionGene con: connections){
+        for(ConnectionGene con: connections.values()){
             if(con.getInNode() == node1.getId() && con.getOutNode() == node2.getId()){
                 //checks node1/in and node2/out is not a valid combo already
                 connectionExists = true;
@@ -62,17 +101,19 @@ public class Genome {
         //inNode and outNode depending on reversed
         //weight THIS MIGHT NEED CHANGED
         //expressed = true because new gene 
-        //innovation# IDK ABOUT THIS
-        connections.add(new ConnectionGene(reversed ? node2.getId() : node1.getId(), reversed ? node1.getId() : node2.getId(), weight, true, 0)); 
+        //innovation# 
+        ConnectionGene newCon = new ConnectionGene(reversed ? node2.getId() : node1.getId(), reversed ? node1.getId() : node2.getId(), weight, true, innovation.assignNewInnovation());
+        connections.put(newCon.getInnovationNumber(),newCon); 
         
     }
     
     
     /**
-     * ADD NODE GENE
+     * Add NodeGene Mutation
      * @param r 
      */
     public void addNodeMutation(Random r, InnovationGenerator innovation){
+        //grab a ranom connection gene
         ConnectionGene con = connections.get(r.nextInt(connections.size()));
         
         NodeGene inNode = nodes.get(con.getInNode());
@@ -83,12 +124,46 @@ public class Genome {
         
         
         NodeGene newNode = new NodeGene(TYPE.HIDDEN,nodes.size());
-        ConnectionGene newIn = new ConnectionGene(inNode.getId(),newNode.getId(),1f,true, innovation.getInnovation());
-        ConnectionGene newOut = new ConnectionGene(newNode.getId(),outNode.getId(),con.getWeight(),true, innovation.getInnovation());
+        ConnectionGene newIn = new ConnectionGene(inNode.getId(),newNode.getId(),1f,true, innovation.assignNewInnovation());
+        ConnectionGene newOut = new ConnectionGene(newNode.getId(),outNode.getId(),con.getWeight(),true, innovation.assignNewInnovation());
         
-        nodes.add(newNode);
-        connections.add(newIn);
-        connections.add(newOut);
+        nodes.put(newNode.getId(),newNode);
+        connections.put(newIn.getInnovationNumber(),newIn);
+        connections.put(newOut.getInnovationNumber(),newOut);
+    }
+    
+    /**
+     * Genome crossover 
+     * *** ASSUMES PARENT ONE IS MORE FIT
+     * @param parent1
+     * @param parent2
+     * @return 
+     */
+    public Genome crossover(Genome parent1, Genome parent2)
+    {
+        
+        Genome child = new Genome();
+        
+        //copies the parent 1 NodeGenes into the new child ASSUMING Parent1 IS MORE FIT
+        for(NodeGene p1Node: parent1.getNodeGenes().values()){
+            child.addNodeGene(p1Node.copy());
+        
+        }
+        
+        //checks for matching connection genes between parents
+        for(ConnectionGene p1Connect: parent1.getConnectionGenes().values()){
+            if(parent2.getConnectionGenes().containsKey(p1Connect.getInnovationNumber())){ //matching
+               
+                //randomly copy from one or the other parent
+                
+                
+            }else{ //disjoint or excess
+                //copy all from fit parent
+                child.addConnectionGene(p1Connect.copy());
+            }
+        }
+        
+        return null;
     }
     
     

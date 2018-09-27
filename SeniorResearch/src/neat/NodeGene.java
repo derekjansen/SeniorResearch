@@ -24,6 +24,12 @@ public class NodeGene {
         this.id = id;
     }
     
+    //copy constructor
+    public NodeGene(NodeGene ng){
+        id = ng.id;
+        type = ng.type;
+    }
+    
     //GETTERS
     public TYPE getType(){
         return type;
@@ -33,6 +39,12 @@ public class NodeGene {
         return id;
     }
     
-    
+    /**
+     * returns a copy of the NodeGene
+     * @return 
+     */
+    public NodeGene copy(){
+        return new NodeGene(type,id);
+    }
     
 }

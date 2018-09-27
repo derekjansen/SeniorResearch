@@ -24,6 +24,15 @@ public class ConnectionGene {
         this.innovationNumber = innovationNumber;
     }
     
+    //copy constructor
+    public ConnectionGene(ConnectionGene cg){
+        inNode = cg.inNode;
+        outNode = cg.outNode;
+        weight = cg.weight;
+        expressed = cg.expressed;
+        innovationNumber = cg.innovationNumber;
+    }
+    
     
     //GETTERS
     public int getInNode(){
@@ -56,5 +65,11 @@ public class ConnectionGene {
         this.expressed = false;
     }
     
-    
+    /**
+     * returns a copy of the ConnectionGene
+     * @return 
+     */
+    public ConnectionGene copy(){
+        return new ConnectionGene(inNode,outNode,weight,expressed,innovationNumber);
+    }  
 }

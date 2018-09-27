@@ -7,8 +7,9 @@ package neat;
  */
 public class InnovationGenerator {
     
+    //HOW to make this work...
     
-    public int getInnovation(){
+    public int assignNewInnovation(){
         return 0;
     }
     
