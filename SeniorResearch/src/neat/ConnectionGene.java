@@ -55,7 +55,9 @@ public class ConnectionGene {
         return innovationNumber;
     }
     
-    
+    public void setWeight(Float f){
+        this.weight = f;
+    }
     
     public void enable(){
         this.expressed = true;

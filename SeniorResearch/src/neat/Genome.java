@@ -12,6 +12,7 @@ import neat.NodeGene.TYPE;
  */
 public class Genome {
     
+    private final float PERTURBED_CHANCE = 0.9f;
     private Map<Integer,ConnectionGene> connections;
     private Map<Integer,NodeGene> nodes;
     
@@ -172,8 +173,22 @@ public class Genome {
     }
     
     
-    public void changeWeightMutation(){
-        
+    
+    /**
+     * **SHOULD BE AN 80% CHANCE OF THIS**
+     * Alters the weight of every ConnectionGene in the Genome
+     * -Chance of weight being uniformly altered: 90%
+     * -Chance of brand new weight: 10%
+     * @param r 
+     */
+    public void changeWeightMutation(Random r){
+        for(ConnectionGene con: connections.values()){
+            if(r.nextFloat() < PERTURBED_CHANCE){
+                con.setWeight(con.getWeight() * (r.nextFloat()*4f-2f));
+            }else{
+                con.setWeight(r.nextFloat()*4f-2f);
+            }
+        }
     }
     
     
