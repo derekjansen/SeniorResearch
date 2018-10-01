@@ -1,7 +1,10 @@
 
 package neat;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import neat.NodeGene.TYPE;
@@ -10,14 +13,12 @@ import neat.NodeGene.TYPE;
  * The genome contains a list of both node genes and connection genes
  * @author derekgrove
  */
-public class Genome {
+public class Genome implements Util{
     
     private final float PERTURBED_CHANCE = 0.9f;
     private Map<Integer,ConnectionGene> connections;
     private Map<Integer,NodeGene> nodes;
     
-    //dont use this yet but could then... 
-    private InnovationGenerator InnoGen;
     
     //constructor
     public Genome(){
@@ -25,6 +26,16 @@ public class Genome {
         nodes = new HashMap();
         connections = new HashMap();
     }
+    
+    //Copy constructor
+    public Genome(Genome copy){
+        super();
+        nodes = copy.nodes;
+        connections = copy.connections;
+    }
+    
+    
+    
     
     /**
      * Adds a ConnectionGene into the Genome's connection list
@@ -67,48 +78,68 @@ public class Genome {
      * @param r 
      * @param innovation 
      */
-    public void addConnectionMutation(Random r, InnovationGenerator innovation){
-        //pick two random nodes 
-        NodeGene node1 = nodes.get(r.nextInt(nodes.size()));
-        NodeGene node2 = nodes.get(r.nextInt(nodes.size()));
-        float weight = r.nextFloat()*2f-1f;
-        
-        //has to do with network ordering of the nodes
-        boolean reversed = false;
-        if(node1.getType() == NodeGene.TYPE.HIDDEN && node2.getType() == NodeGene.TYPE.INPUT){
-            reversed = true; //hidden->input doesnt work so reverse
-        }else if(node1.getType() == NodeGene.TYPE.OUTPUT && node2.getType() == NodeGene.TYPE.HIDDEN){
-            reversed = true; //output->hidden doesnt work so reverse
-        }else if(node1.getType() == NodeGene.TYPE.OUTPUT && node2.getType() == NodeGene.TYPE.INPUT){
-            reversed = true; //output->input doesnt work so reverse
-        }
-        
-        
-        //checks to make sure the connection isnt already made
-        boolean connectionExists = false;
-        for(ConnectionGene con: connections.values()){
-            if(con.getInNode() == node1.getId() && con.getOutNode() == node2.getId()){
-                //checks node1/in and node2/out is not a valid combo already
-                connectionExists = true;
-                break;
-            } else if(con.getInNode() == node2.getId() && con.getOutNode() == node1.getId()){
-                //checks node2/in and node1/out is not a valid combo already
-                connectionExists = true;
-                break;
+    public void addConnectionMutation(Random r, InnovationGenerator innovation, int maxAttempts) {
+        int tries = 0;
+        boolean success = false;
+
+        while (tries < maxAttempts && success == false) {
+            tries++;
+            //pick two random nodes 
+            NodeGene node1 = nodes.get(r.nextInt(nodes.size()));
+            NodeGene node2 = nodes.get(r.nextInt(nodes.size()));
+            float weight = r.nextFloat() * 2f - 1f;
+
+            //has to do with network ordering of the nodes
+            boolean reversed = false;
+            if (node1.getType() == NodeGene.TYPE.HIDDEN && node2.getType() == NodeGene.TYPE.INPUT) {
+                reversed = true; //hidden->input doesnt work so reverse
+            } else if (node1.getType() == NodeGene.TYPE.OUTPUT && node2.getType() == NodeGene.TYPE.HIDDEN) {
+                reversed = true; //output->hidden doesnt work so reverse
+            } else if (node1.getType() == NodeGene.TYPE.OUTPUT && node2.getType() == NodeGene.TYPE.INPUT) {
+                reversed = true; //output->input doesnt work so reverse
             }
+
+            
+            boolean connectionImpossible = false;
+            if(node1.getType() == NodeGene.TYPE.INPUT && node2.getType() == NodeGene.TYPE.INPUT){
+                connectionImpossible = true;
+            }else if(node1.getType() == NodeGene.TYPE.OUTPUT && node2.getType() == NodeGene.TYPE.OUTPUT){
+                connectionImpossible = true;
+            }
+            
+            
+            
+            //checks to make sure the connection isnt already made
+            boolean connectionExists = false;
+            for (ConnectionGene con : connections.values()) {
+                if (con.getInNode() == node1.getId() && con.getOutNode() == node2.getId()) {
+                    //checks node1/in and node2/out is not a valid combo already
+                    connectionExists = true;
+                    break;
+                } else if (con.getInNode() == node2.getId() && con.getOutNode() == node1.getId()) {
+                    //checks node2/in and node1/out is not a valid combo already
+                    connectionExists = true;
+                    break;
+                }
+            }
+
+            if (connectionExists || connectionImpossible) {
+                continue;
+            }
+
+            //inNode and outNode depending on reversed
+            //weight THIS MIGHT NEED CHANGED
+            //expressed = true because new gene 
+            //innovation# 
+            ConnectionGene newCon = new ConnectionGene(reversed ? node2.getId() : node1.getId(), reversed ? node1.getId() : node2.getId(), weight, true, innovation.assignNewInnovation());
+            connections.put(newCon.getInnovationNumber(), newCon);
+            success = true;
         }
-        
-        if(connectionExists){
-            return;
+
+        if (success == false) {
+            System.out.println("Tried, but could not add more connections");
         }
-        
-        //inNode and outNode depending on reversed
-        //weight THIS MIGHT NEED CHANGED
-        //expressed = true because new gene 
-        //innovation# 
-        ConnectionGene newCon = new ConnectionGene(reversed ? node2.getId() : node1.getId(), reversed ? node1.getId() : node2.getId(), weight, true, innovation.assignNewInnovation());
-        connections.put(newCon.getInnovationNumber(),newCon); 
-        
+
     }
     
     
@@ -117,7 +148,7 @@ public class Genome {
      * @param r 
      * @param innovation 
      */
-    public void addNodeMutation(Random r, InnovationGenerator innovation){
+    public void addNodeMutation(Random r, InnovationGenerator connectionInnovation, InnovationGenerator nodeInnovation){
         //grab a ranom connection gene
         ConnectionGene con = connections.get(r.nextInt(connections.size()));
         
@@ -128,9 +159,9 @@ public class Genome {
         con.disable();
         
         
-        NodeGene newNode = new NodeGene(TYPE.HIDDEN,nodes.size());
-        ConnectionGene newIn = new ConnectionGene(inNode.getId(),newNode.getId(),1f,true, innovation.assignNewInnovation());
-        ConnectionGene newOut = new ConnectionGene(newNode.getId(),outNode.getId(),con.getWeight(),true, innovation.assignNewInnovation());
+        NodeGene newNode = new NodeGene(TYPE.HIDDEN, nodeInnovation.assignNewInnovation());
+        ConnectionGene newIn = new ConnectionGene(inNode.getId(),newNode.getId(),1f,true, connectionInnovation.assignNewInnovation());
+        ConnectionGene newOut = new ConnectionGene(newNode.getId(),outNode.getId(),con.getWeight(),true, connectionInnovation.assignNewInnovation());
         
         nodes.put(newNode.getId(),newNode);
         connections.put(newIn.getInnovationNumber(),newIn);

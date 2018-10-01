@@ -9,16 +9,15 @@ import java.util.List;
  *
  * @author derekgrove
  */
-public class Util {
+public interface Util {
     
     
-    private static List<Integer> tempList1 = new ArrayList();
-    private static List<Integer> tempList2 = new ArrayList();
+    public static List<Integer> tempList1 = new ArrayList();
+    public static List<Integer> tempList2 = new ArrayList();
     
-    //LOTS OF DUP CODE.. CAN PROBS SEPERATE OUT
     
     /**
-     * 
+     * Check how similar two genomes are to see if they belong in the same species
      * @param genome1
      * @param genome2
      * @param c1
@@ -27,7 +26,7 @@ public class Util {
      * @param N
      * @return 
      */
-    public static float compatabilityDistance(Genome genome1, Genome genome2, int c1, int c2, int c3, int N){
+    public static float compatabilityDistance(Genome genome1, Genome genome2, float c1, float c2, float c3, float N){
         int E = countExcessGenes(genome1,genome2);
         int D = countDisjointGenes(genome1,genome2);
         float W = averageWeightDiff(genome1,genome2);  
@@ -192,12 +191,12 @@ public class Util {
     
     
     /**
-     * 
+     * Computes the average difference in connection weights between two genomes
      * @param genome1
      * @param genome2
      * @return 
      */
-    private static float averageWeightDiff(Genome genome1, Genome genome2){
+    public static float averageWeightDiff(Genome genome1, Genome genome2){
          float matchingGenes = 0f;
          float weightDifference = 0f;
         
@@ -224,15 +223,14 @@ public class Util {
     
     
     
-    
-    
+
     /**
      * Takes a list and sorts it
      * @param <T>
      * @param c
      * @return 
      */
-    private static List<Integer> asSortedList(Collection<Integer> c, List<Integer> list){
+    public static List<Integer> asSortedList(Collection<Integer> c, List<Integer> list){
         list.clear();
         list.addAll(c);
         java.util.Collections.sort(list);
