@@ -30,8 +30,17 @@ public class Genome implements Util{
     //Copy constructor
     public Genome(Genome copy){
         super();
-        nodes = copy.nodes;
-        connections = copy.connections;
+        nodes = new HashMap<Integer,NodeGene>();
+        connections = new HashMap<Integer,ConnectionGene>();
+        
+        for(Integer index: copy.getNodeGenes().keySet()){
+            nodes.put(index, new NodeGene(copy.getNodeGenes().get(index)));
+        }
+        
+        for(Integer index: copy.getConnectionGenes().keySet()){
+            connections.put(index, new ConnectionGene(copy.getConnectionGenes().get(index)));
+        }
+        
     }
     
     
