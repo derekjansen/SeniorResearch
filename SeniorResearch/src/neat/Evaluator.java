@@ -246,46 +246,6 @@ public abstract class Evaluator {
             this.fitness = fitness;
         }
     }
-    
-    public class Species{
-    
-        public Genome mascot;
-        public List<Genome> members;
-        public List<FitnessGenome> fitnessPop;
-        public float totalAdjustedFitness = 0f;
-        
-        public Species(Genome mascot){
-            this.mascot = mascot;
-            this.members = new LinkedList<Genome>();
-            this.members.add(mascot);
-            this.fitnessPop = new ArrayList<FitnessGenome>();
-        }
-        
-        public void addAdjustedFitness(float adjustedFitness){
-            this.totalAdjustedFitness += adjustedFitness;
-        }
-        
-        public void reset(Random r){
-            int newMascotIndex = r.nextInt(members.size());
-            this.mascot = members.get(newMascotIndex);
-            members.clear();
-            fitnessPop.clear();
-            totalAdjustedFitness = 0f;
-        }
-    }
-    
-    public class FitnessGenomeComparator implements Comparator<FitnessGenome>{
-        @Override
-        public int compare(FitnessGenome one, FitnessGenome two){
-            if(one.fitness > two.fitness){
-                return 1;
-            }else if(two.fitness > one.fitness){
-                return -1;
-            }
-            return 0;
-        }
-    }
-    
-    
+
 }
   

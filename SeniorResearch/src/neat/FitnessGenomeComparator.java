@@ -5,10 +5,20 @@
  */
 package neat;
 
+import java.util.Comparator;
+
 /**
  *
  * @author derekgrove
  */
-class FitnessGenomeComparator {
-    
-}
+ public class FitnessGenomeComparator implements Comparator<Evaluator.FitnessGenome>{
+        @Override
+        public int compare(Evaluator.FitnessGenome one, Evaluator.FitnessGenome two){
+            if(one.fitness > two.fitness){
+                return 1;
+            }else if(two.fitness > one.fitness){
+                return -1;
+            }
+            return 0;
+        }
+    }  
