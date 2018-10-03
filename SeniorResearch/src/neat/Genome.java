@@ -93,11 +93,20 @@ public class Genome implements Util{
 
         while (tries < maxAttempts && success == false) {
             tries++;
+            
+            Integer[] nodeInnovationNumbers = new Integer[nodes.keySet().size()];
+            nodes.keySet().toArray(nodeInnovationNumbers);
+            Integer keyNode1 = nodeInnovationNumbers[r.nextInt(nodeInnovationNumbers.length)];
+            Integer keyNode2 = nodeInnovationNumbers[r.nextInt(nodeInnovationNumbers.length)];
+            
+            
             //pick two random nodes 
-            NodeGene node1 = nodes.get(r.nextInt(nodes.size()));
-            NodeGene node2 = nodes.get(r.nextInt(nodes.size()));
+            NodeGene node1 = nodes.get(keyNode1);
+            NodeGene node2 = nodes.get(keyNode2);
             float weight = r.nextFloat() * 2f - 1f;
 
+            
+            
             //has to do with network ordering of the nodes
             boolean reversed = false;
             if (node1.getType() == NodeGene.TYPE.HIDDEN && node2.getType() == NodeGene.TYPE.INPUT) {
@@ -159,7 +168,7 @@ public class Genome implements Util{
      */
     public void addNodeMutation(Random r, InnovationGenerator connectionInnovation, InnovationGenerator nodeInnovation){
         //grab a ranom connection gene
-        ConnectionGene con = connections.get(r.nextInt(connections.size()));
+        ConnectionGene con = (ConnectionGene) connections.values().toArray()[r.nextInt(connections.size())];
         
         NodeGene inNode = nodes.get(con.getInNode());
         NodeGene outNode = nodes.get(con.getOutNode());

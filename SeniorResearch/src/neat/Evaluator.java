@@ -19,7 +19,7 @@ import java.util.Random;
  *
  * @author derekgrove
  */
-public abstract class Evaluator {
+public abstract class Evaluator implements Tuning{
  
     private FitnessGenomeComparator fitComp = new FitnessGenomeComparator();
     
@@ -28,15 +28,15 @@ public abstract class Evaluator {
     
     private Random random = new Random();
     
-    //Constants for tuning
-    private float c1 = 1.0f;
-    private float c2 = 1.0f;
-    private float c3 = 0.4f;
-    private float DT = 10.0f;
-    private float N = 1.0f;
-    private float MUTATION_RATE = 0.5f;
-    private float ADD_CONNECTION_RATE = 0.1f;
-    private float ADD_NODE_RATE = 0.1f;
+//    //Constants for tuning
+//    private float c1 = 1.0f;
+//    private float c2 = 1.0f;
+//    private float c3 = 0.4f;
+//    private float DT = 10.0f;
+//   // private float N = 1.0f;
+//    private float MUTATION_RATE = 0.5f;
+//    private float ADD_CONNECTION_RATE = 0.1f;
+//    private float ADD_NODE_RATE = 0.1f;
     
     private int populationSize;
     
@@ -94,7 +94,7 @@ public abstract class Evaluator {
             boolean foundSpecies = false;
             for(Species s: species){
                          
-                if(Util.compatabilityDistance(g,s.mascot,c1,c2,c3,N) < DT){
+                if(Util.compatabilityDistance(g,s.mascot,c1,c2,c3) < DT){
                     s.members.add(g);
                     mappedSpecies.put(g, s);
                     foundSpecies = true;

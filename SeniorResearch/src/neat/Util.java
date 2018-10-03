@@ -26,12 +26,12 @@ public interface Util {
      * @param N
      * @return 
      */
-    public static float compatabilityDistance(Genome genome1, Genome genome2, float c1, float c2, float c3, float N){
+    public static float compatabilityDistance(Genome genome1, Genome genome2, float c1, float c2, float c3){
         int E = countExcessGenes(genome1,genome2);
         int D = countDisjointGenes(genome1,genome2);
         float W = averageWeightDiff(genome1,genome2);  
         
-        return (c1*E/N)+(c2*D/N)+(c3*W);
+        return (c1*E)+(c2*D)+(c3*W);
     }
     
     

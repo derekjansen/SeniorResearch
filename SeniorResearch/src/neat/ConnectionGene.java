@@ -6,7 +6,7 @@ package neat;
  */
 public class ConnectionGene {
     
-    //idk about using ints here but we will roll with it for now
+
     private int inNode;
     private int outNode;
     private float weight;
