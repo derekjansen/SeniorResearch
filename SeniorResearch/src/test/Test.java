@@ -5,11 +5,13 @@
  */
 package test;
 
-import java.util.Random;
-import neat.NodeGene.TYPE;
-import neat.Genome;
-import neat.NodeGene;
 import neat.ConnectionGene;
+import neat.Counter;
+import neat.Evaluator;
+import neat.Genome;
+
+import neat.NodeGene;
+import neat.NodeGene.TYPE;
 
 /**
  *
@@ -17,49 +19,40 @@ import neat.ConnectionGene;
  */
 public class Test {
     public static void main(String argv[]){
-        //REPLICATING THE EXAMPLE IN KEN STANLEY PAPER
+        Counter nodeInnovation = new Counter();
+        Counter connectionInnovation = new Counter();
         
-        //parent 1 and adding the nodes
-        Genome parent1 = new Genome();
-        for(int i=0; i<3;i++){
-            NodeGene newNode = new NodeGene(TYPE.INPUT,i++);
-            parent1.addNodeGene(newNode);
-        }
-        parent1.addNodeGene(new NodeGene(TYPE.OUTPUT,4));
-        parent1.addNodeGene(new NodeGene(TYPE.HIDDEN,5));
+        Genome genome = new Genome();
         
-        //adding connections for parent 1
-        parent1.addConnectionGene(new ConnectionGene(1,4,1f,true,1));
-        parent1.addConnectionGene(new ConnectionGene(2,4,1f,false,2));
-        parent1.addConnectionGene(new ConnectionGene(3,4,1f,true,3));
-        parent1.addConnectionGene(new ConnectionGene(2,5,1f,true,4));
-        parent1.addConnectionGene(new ConnectionGene(5,4,1f,true,5));
-        parent1.addConnectionGene(new ConnectionGene(1,5,1f,true,8));
+        //create nodeGenes
+        int n1 = nodeInnovation.getInnovation();
+        int n2 = nodeInnovation.getInnovation();
+        int n3 = nodeInnovation.getInnovation();
+        genome.addNodeGene(new NodeGene(TYPE.INPUT,n1));
+        genome.addNodeGene(new NodeGene(TYPE.INPUT,n2));
+        genome.addNodeGene(new NodeGene(TYPE.OUTPUT,n3));
+        
+        //create connectionGenes
+        int c1 = connectionInnovation.getInnovation();
+        int c2 = connectionInnovation.getInnovation();
+        genome.addConnectionGene(new ConnectionGene(n1,n3,0.5f,true,c1));
+        genome.addConnectionGene(new ConnectionGene(n2,n3,0.5f,true,c2));
         
         
-        //parent 1 and adding the nodes
-        Genome parent2 = new Genome();
-        for(int i=0; i<3;i++){
-            NodeGene newNode = new NodeGene(TYPE.INPUT,i++);
-            parent2.addNodeGene(newNode);
-        }
-        parent2.addNodeGene(new NodeGene(TYPE.OUTPUT,4));
-        parent2.addNodeGene(new NodeGene(TYPE.HIDDEN,5));
-        parent2.addNodeGene(new NodeGene(TYPE.HIDDEN,6));
+        //create evaluator
+        Evaluator eval = new Evaluator(100, genome, nodeInnovation, connectionInnovation){
+            @Override
+            protected float evaluateGenome(Genome genome){
+                return genome.getConnectionGenes().values().size();
+            }
+        };
         
-        //adding connections for parent 1
-        parent2.addConnectionGene(new ConnectionGene(1,4,1f,true,1));
-        parent2.addConnectionGene(new ConnectionGene(2,4,1f,false,2));
-        parent2.addConnectionGene(new ConnectionGene(3,4,1f,true,3));
-        parent2.addConnectionGene(new ConnectionGene(2,5,1f,true,4));
-        parent2.addConnectionGene(new ConnectionGene(5,4,1f,false,5));
-        parent2.addConnectionGene(new ConnectionGene(5,6,1f,true,6));
-        parent2.addConnectionGene(new ConnectionGene(6,4,1f,true,7));
-        parent2.addConnectionGene(new ConnectionGene(3,5,1f,true,9));
-        parent2.addConnectionGene(new ConnectionGene(1,6,1f,true,10));
-        
-        Genome child = Genome.crossover(parent2, parent1, new Random());
-        
+        for(int i = 0; i < 100; i++){
+            eval.evaluate();
+            System.out.print("Generation: " + i);
+            System.out.print("\tHighest fitness: " + eval.getHighestFitness());
+            System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
+        } 
     }
     
 }

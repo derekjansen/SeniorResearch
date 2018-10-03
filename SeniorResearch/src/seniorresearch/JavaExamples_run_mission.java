@@ -31,11 +31,8 @@ import com.microsoft.msr.malmo.*;
 public class JavaExamples_run_mission
 {
     static
-    {
-        //System.loadLibrary("MalmoJava"); // attempts to load MalmoJava.dll (on Windows) or libMalmoJava.so (on Linux)
-        
-        //NEED TO SET ENVIRONMENT VARIABLES
-        System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib");  //think this might work
+    {        
+        System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
     }
 
     public static void main(String argv[])
@@ -62,16 +59,41 @@ public class JavaExamples_run_mission
             System.exit(0);
         }
         
+        
+        
+        //Set world/mission specs
         MissionSpec my_mission = new MissionSpec();
-        my_mission.timeLimitInSeconds(60000);
+        my_mission.timeLimitInSeconds(15000);
         my_mission.requestVideo( 800, 600 );
         my_mission.rewardForReachingPosition(19.5f,0.0f,19.5f,100.0f,1.1f);
-
+        
+        
+        
+        //my_mission.drawLine(800, 228, -400, 840, 228, -420, "0");
+        
+        
+        
+        //my_mission.setTimeOfDay(1000, true);
+        
+        my_mission.startAt(800f, 227f, -400f);
+                                //227 is ground level apparently 
+                                
+        System.out.println(my_mission.getAsXML(true));
+       
+        
+        
+        
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
         my_mission_record.recordCommands();
         my_mission_record.recordMP4(20, 400000);
         my_mission_record.recordRewards();
         my_mission_record.recordObservations();
+        
+        
+        
+        
+        
+        
 
         try {
             agent_host.startMission( my_mission, my_mission_record );
@@ -110,7 +132,16 @@ public class JavaExamples_run_mission
         
         // main loop:
         do {
-            agent_host.sendCommand( "move 1" );
+            agent_host.sendCommand( "attack 0" );
+            agent_host.sendCommand( "move 0.75" );
+            try {
+                Thread.sleep(3000);
+            } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return;
+            }
+           
+            agent_host.sendCommand( "move 0" );
             agent_host.sendCommand( "turn " + Math.random() );
             try {
                 Thread.sleep(500);
@@ -119,19 +150,26 @@ public class JavaExamples_run_mission
                 return;
             }
             
-            world_state = agent_host.getWorldState();
-            
-            
-            System.out.print( "video,observations,rewards received: " );
-            
-            System.out.print( world_state.getNumberOfVideoFramesSinceLastState() + "," );
-            System.out.print( world_state.getNumberOfObservationsSinceLastState() + "," );
-            System.out.println( world_state.getNumberOfRewardsSinceLastState() );
-            
-            for( int i = 0; i < world_state.getRewards().size(); i++ ) {
-                TimestampedReward reward = world_state.getRewards().get(i);
-                System.out.println( "Summed reward: " + reward.getValue() );
+            agent_host.sendCommand( "turn 0" );
+            agent_host.sendCommand( "jump 1"  );
+            try {
+                Thread.sleep(1000);
+            } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return;
             }
+            
+            agent_host.sendCommand( "jump 0" );
+            agent_host.sendCommand( "attack 1");
+            try {
+                Thread.sleep(1000);
+            } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return;
+            }
+            
+            world_state = agent_host.getWorldState();
+
             for( int i = 0; i < world_state.getErrors().size(); i++ ) {
                 TimestampedString error = world_state.getErrors().get(i);
                 System.err.println( "Error: " + error.getText() );
