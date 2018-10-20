@@ -175,7 +175,7 @@ public abstract class Evaluator implements Tuning{
             	 return fg.genome;
             }
         }
-        throw new RuntimeException("Couldn't find a genome... Number is genomes in sel�ected species is "+selectFrom.fitnessPop.size()+", and the total adjusted fitness is "+completeWeight);
+        throw new RuntimeException("Couldn't find a genome... Number is genomes in selected species is "+selectFrom.fitnessPop.size()+", and the total adjusted fitness is "+completeWeight);
 	}
 	
 	public int getSpeciesAmount() {
