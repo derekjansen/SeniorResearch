@@ -42,6 +42,8 @@ public class Test {
         //create evaluator
         Evaluator eval = new Evaluator(100, genome, nodeInnovation, connectionInnovation){
             @Override
+            
+            //THIS IS WHERE I CODE HOW TO EVALUATE THE GENOME
             protected float evaluateGenome(Genome genome){
                 return genome.getConnectionGenes().values().size();
             }

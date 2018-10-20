@@ -7,8 +7,16 @@
 //                                               java -cp MalmoJavaJar.jar;JavaExamples_run_mission.jar -Djava.library.path=. JavaExamples_run_mission (on Windows)
 
 package seniorresearch;
-
 import com.microsoft.msr.malmo.*;
+import java.io.File;
+import java.io.StringWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
 
 public class Runner
 {
@@ -17,8 +25,35 @@ public class Runner
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
     }
 
+    
+    private static Document convertXMLFileToXMLDocument(String filePath) 
+{
+	//Parser that produces DOM object trees from XML content
+	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	
+	//API to obtain DOM Document instance
+	DocumentBuilder builder = null;
+	try 
+	{
+		//Create DocumentBuilder with default configuration
+		builder = factory.newDocumentBuilder();
+		
+		//Parse the content to Document object
+		Document xmlDocument = builder.parse(new File(filePath));
+		
+		return xmlDocument;
+	} 
+	catch (Exception e) 
+	{
+		e.printStackTrace();
+	}
+	return null;
+}
+    
     public static void main(String argv[]) throws Exception
     {
+        
+        ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
         AgentHost agent_host = new AgentHost();
         try
@@ -41,27 +76,38 @@ public class Runner
             System.exit(0);
         }
         
-        MissionSpec my_mission = new MissionSpec("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-"<Mission xmlns=\"http://ProjectMalmo.microsoft.com\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
-"<About><Summary>Defaut Mission</Summary></About><ServerSection><ServerInitialConditions><Time><StartTime>1000</StartTime><AllowPassageOfTime>false</AllowPassageOfTime></Time></ServerInitialConditions><ServerHandlers>\n" +
-"<FlatWorldGenerator generatorString=\"3;7,220*1,5*3,2;3;,biome_1\"/>\n" +
-"<DrawingDecorator><DrawLine x1=\"2\" y1=\"227\" z1=\"2\" x2=\"2\" y2=\"227\" z2=\"-12\" type=\"stone\"/><DrawLine x1=\"2\" y1=\"227\" z1=\"-12\" x2=\"-12\" y2=\"227\" z2=\"-12\" type=\"stone\" /><DrawLine x1=\"-12\" y1=\"227\" z1=\"-12\" x2=\"-12\" y2=\"227\" z2=\"2\" type=\"stone\" /><DrawLine x1=\"-12\" y1=\"227\" z1=\"2\" x2=\"2\" y2=\"227\" z2=\"2\" type=\"stone\" /></DrawingDecorator>\n" +
-"<ServerQuitFromTimeUp timeLimitMs=\"15000\"/><ServerQuitWhenAnyAgentFinishes/></ServerHandlers></ServerSection><AgentSection><Name>A default agent</Name><AgentStart><Placement x=\"0\" y=\"228\" z=\"0\" yaw=\"90\"/><Inventory><InventoryItem slot=\"0\" type=\"diamond_sword\" /></Inventory></AgentStart><AgentHandlers>\n" +
-"<ObservationFromFullStats/><ContinuousMovementCommands/><VideoProducer viewpoint=\"1\"><Width>800</Width><Height>600</Height></VideoProducer><RewardForReachingPosition><Marker x=\"19.5\" y=\"0\" z=\"19.5\" reward=\"100\" tolerance=\"1.10000002\"/></RewardForReachingPosition></AgentHandlers></AgentSection></Mission>\n" +
-"", true);
+        //new 
         
+        final String xmlFilePath = "/Users/derekgrove/NetBeansProjects/SeniorResearch/SeniorResearch/src/seniorresearch/MainMission.xml";
+        Document xmlDoc = convertXMLFileToXMLDocument(xmlFilePath);
+        
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer;
+        String missionXmlString;
+        try {
+            transformer = tf.newTransformer();
+            
+            // Uncomment if you do not require XML declaration
+            // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            
+            //Print XML or Logs or Console
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(xmlDoc), new StreamResult(writer));
+             missionXmlString = writer.getBuffer().toString();	
+           		
+        }catch(Exception e){
+            System.out.println("Conversion from xml to string errored out");
+            missionXmlString = null; 
+        }
+        
+        MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
         my_mission_record.recordCommands();
         my_mission_record.recordMP4(20, 400000);
         my_mission_record.recordRewards();
         my_mission_record.recordObservations();
-        
-        
-        
-        
-        
-        
+
 
         try {
             agent_host.startMission( my_mission, my_mission_record);
@@ -96,9 +142,17 @@ public class Runner
         System.out.println( "" );
 
 
+        ///////////////////////// SET UP NEAT ///////////////////////////////////
         
         
-        //MAIN LOOP:
+        
+        
+        
+        
+        
+        
+        
+        ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         do {
             
             
@@ -133,10 +187,16 @@ public class Runner
                 TimestampedString error = world_state.getErrors().get(i);
                 System.err.println( "Error: " + error.getText() );
             }
+           
             
+            
+          //  if(agent_host.getWorldState().getNumberOfObservationsSinceLastState() > 0){
+                
             
             System.out.println(agent_host.getWorldState().getObservations());
-
+             System.out.println(agent_host.getWorldState().getObservations().size());
+            
+         //   }
             
             
             
