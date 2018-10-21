@@ -24,34 +24,20 @@ public class Runner
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
     }
-
-    
-    private static Document convertXMLFileToXMLDocument(String filePath) 
-{
-	//Parser that produces DOM object trees from XML content
-	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	
-	//API to obtain DOM Document instance
-	DocumentBuilder builder = null;
-	try 
-	{
-		//Create DocumentBuilder with default configuration
-		builder = factory.newDocumentBuilder();
-		
-		//Parse the content to Document object
-		Document xmlDocument = builder.parse(new File(filePath));
-		
-		return xmlDocument;
-	} 
-	catch (Exception e) 
-	{
-		e.printStackTrace();
-	}
-	return null;
-}
     
     public static void main(String argv[]) throws Exception
     {
+        
+        //////////////////SET UP NEAT CODE/////////////////////
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
@@ -107,7 +93,7 @@ public class Runner
         my_mission_record.recordMP4(20, 400000);
         my_mission_record.recordRewards();
         my_mission_record.recordObservations();
-
+        
 
         try {
             agent_host.startMission( my_mission, my_mission_record);
@@ -141,29 +127,24 @@ public class Runner
         } while( !world_state.getIsMissionRunning() );
         System.out.println( "" );
 
-
-        ///////////////////////// SET UP NEAT ///////////////////////////////////
-        
-        
-        
-        
-        
-        
-        
-        
+       
         
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
+        //Spawn zmobie in the corner
+        agent_host.sendCommand("chat /summon zombie -11 228 -11");
+            
+         
+          
+        
         do {
             
             
             
             
+            //WHY DOES IT JUMP SO FAR
             
             
-            
-            agent_host.sendCommand( "move 0" );
-           
-            agent_host.sendCommand( "turn " + Math.random() );
+            agent_host.sendCommand( "move 1" );
             try {
                 Thread.sleep(500);
             } catch(InterruptedException ex) {
@@ -171,15 +152,17 @@ public class Runner
                 return;
             }
             
-            agent_host.sendCommand( "turn 0" );
+
             
-            agent_host.sendCommand( "move 0.75");
+            agent_host.sendCommand( "turn 1" );
             try {
-                Thread.sleep(2000);
+                Thread.sleep(500);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
                 return;
             }
+            
+            
             
             world_state = agent_host.getWorldState();
 
@@ -190,20 +173,47 @@ public class Runner
            
             
             
-          //  if(agent_host.getWorldState().getNumberOfObservationsSinceLastState() > 0){
-                
+            System.out.println(agent_host.getWorldState().getObservations().size());
             
             System.out.println(agent_host.getWorldState().getObservations());
-             System.out.println(agent_host.getWorldState().getObservations().size());
+             
             
-         //   }
-            
-            
-            
-            
+              
         } while(world_state.getIsMissionRunning() );
 
         System.out.println( "Mission has stopped." );
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        private static Document convertXMLFileToXMLDocument(String filePath) 
+{
+	//Parser that produces DOM object trees from XML content
+	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	
+	//API to obtain DOM Document instance
+	DocumentBuilder builder = null;
+	try 
+	{
+		//Create DocumentBuilder with default configuration
+		builder = factory.newDocumentBuilder();
+		
+		//Parse the content to Document object
+		Document xmlDocument = builder.parse(new File(filePath));
+		
+		return xmlDocument;
+	} 
+	catch (Exception e) 
+	{
+		e.printStackTrace();
+	}
+	return null;
+}
 }
 

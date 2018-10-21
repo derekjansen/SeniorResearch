@@ -6,7 +6,7 @@
     <ServerSection>
         <ServerInitialConditions>
             <Time>
-                <StartTime>1000</StartTime>
+                <StartTime>12000</StartTime>
                 <AllowPassageOfTime>false</AllowPassageOfTime>
             </Time>
         </ServerInitialConditions>
@@ -28,17 +28,22 @@
             <Placement x="0" y="228" z="0" yaw="90"/>
             <Inventory>
                 <InventoryItem slot="0" type="diamond_sword" />
+                <InventoryItem slot="39" type="diamond_helmet" />
+                <InventoryItem slot="38" type="diamond_chestplate" />
+                <InventoryItem slot="37" type="diamond_leggings" />
+                <InventoryItem slot="36" type="diamond_boots" />
             </Inventory>
         </AgentStart>
         <AgentHandlers>
-            <ObservationFromGrid>
+            <ChatCommands/>
+            <DiscreteMovementCommands/>
+         <!--   <ObservationFromGrid>
                 <Grid name="floor3x3">
                     <min x="-1" y="-1" z="-1"/>
                     <max x="1" y="-1" z="1"/>
                 </Grid>
-            </ObservationFromGrid>
+            </ObservationFromGrid> -->
             <ObservationFromFullStats/>
-            <ContinuousMovementCommands/>
             <VideoProducer viewpoint="1">
                 <Width>800</Width>
                 <Height>600</Height>
