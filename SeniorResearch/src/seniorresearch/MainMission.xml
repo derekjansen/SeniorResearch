@@ -6,7 +6,7 @@
     <ServerSection>
         <ServerInitialConditions>
             <Time>
-                <StartTime>12000</StartTime>
+                <StartTime>15000</StartTime>
                 <AllowPassageOfTime>false</AllowPassageOfTime>
             </Time>
         </ServerInitialConditions>
@@ -17,6 +17,10 @@
                 <DrawLine x1="2" y1="227" z1="-12" x2="-12" y2="227" z2="-12" type="stone" />
                 <DrawLine x1="-12" y1="227" z1="-12" x2="-12" y2="227" z2="2" type="stone" />
                 <DrawLine x1="-12" y1="227" z1="2" x2="2" y2="227" z2="2" type="stone" />
+                <DrawLine x1="2" y1="228" z1="2" x2="2" y2="228" z2="-12" type="stone"/>
+                <DrawLine x1="2" y1="228" z1="-12" x2="-12" y2="228" z2="-12" type="stone" />
+                <DrawLine x1="-12" y1="228" z1="-12" x2="-12" y2="228" z2="2" type="stone" />
+                <DrawLine x1="-12" y1="228" z1="2" x2="2" y2="228" z2="2" type="stone" />
             </DrawingDecorator>
             <ServerQuitFromTimeUp timeLimitMs="15000"/>
             <ServerQuitWhenAnyAgentFinishes/>
@@ -38,15 +42,8 @@
             <ChatCommands/>
             <ContinuousMovementCommands/>
             <ObservationFromNearbyEntities>
-                <Range name="theEntity" xrange="3" yrange="1" zrange="3" update_frequency="20"/>
-               
+                <Range name="Entities" xrange="5" yrange="1" zrange="5" update_frequency="20"/>
             </ObservationFromNearbyEntities>
-         <!--   <ObservationFromGrid>
-                <Grid name="floor3x3">
-                    <min x="-1" y="-1" z="-1"/>
-                    <max x="1" y="-1" z="1"/>
-                </Grid>
-            </ObservationFromGrid> -->
             <ObservationFromFullStats/>
             <VideoProducer viewpoint="1">
                 <Width>800</Width>

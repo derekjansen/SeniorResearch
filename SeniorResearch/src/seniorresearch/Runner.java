@@ -1,11 +1,4 @@
 
-// To compile:  javac -cp MalmoJavaJar.jar JavaExamples_run_mission.java
-// To run:      java -cp MalmoJavaJar.jar:. JavaExamples_run_mission  (on Linux)
-//              java -cp MalmoJavaJar.jar;. JavaExamples_run_mission  (on Windows)
-
-// To run from the jar file without compiling:   java -cp MalmoJavaJar.jar:JavaExamples_run_mission.jar -Djava.library.path=. JavaExamples_run_mission (on Linux)
-//                                               java -cp MalmoJavaJar.jar;JavaExamples_run_mission.jar -Djava.library.path=. JavaExamples_run_mission (on Windows)
-
 package seniorresearch;
 import com.microsoft.msr.malmo.*;
 import java.io.File;
@@ -29,7 +22,7 @@ import org.json.*;
 public class Runner
 {
     static Map<Integer,String> outputButtonNames;
-    
+    static Map<Integer,String> inputButtonNames;
     
     static
     {        
@@ -41,8 +34,8 @@ public class Runner
         
         //////////////////SET UP NEAT CODE/////////////////////
         
-        
-         Map<Integer,String> inputButtonNames = new HashMap();
+        //associate nodes with input/output
+        inputButtonNames = new HashMap();
         outputButtonNames = new HashMap();
         
         
@@ -61,23 +54,40 @@ public class Runner
         int n4 = nodeInnovation.getInnovation();
         int n5 = nodeInnovation.getInnovation();
         int n6 = nodeInnovation.getInnovation();
-        
+        int n7 = nodeInnovation.getInnovation();
+        int n8 = nodeInnovation.getInnovation();
+        int n9 = nodeInnovation.getInnovation();
+        int n10 = nodeInnovation.getInnovation();
+        int n11 = nodeInnovation.getInnovation();
+        int n12 = nodeInnovation.getInnovation();
         
         //inputs
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
-
-        
+        inputButtonNames.put(n1, "Life");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n2));
+        inputButtonNames.put(n2, "XPos");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n3));
+        inputButtonNames.put(n3, "ZPos");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
+        inputButtonNames.put(n4, "MobsKilled");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
+        inputButtonNames.put(n5, "DamageTaken");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
+        inputButtonNames.put(n6, "DamageDealt");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n7));
+        inputButtonNames.put(n7, "TimeAlive");
+                
         //map the outputs to their movement "buttons"
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n2));
-        outputButtonNames.put(n2,"move 1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n3));
-        outputButtonNames.put(n3,"move -1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n4));
-        outputButtonNames.put(n4,"turn 1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n5));
-        outputButtonNames.put(n5,"turn -1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n6));
-        outputButtonNames.put(n6,"attack 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n8));
+        outputButtonNames.put(n8,"move 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n9));
+        outputButtonNames.put(n9,"move -1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n10));
+        outputButtonNames.put(n10,"turn 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n11));
+        outputButtonNames.put(n11,"turn -1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n12));
+        outputButtonNames.put(n12,"attack 1");
         
         
         
@@ -93,17 +103,21 @@ public class Runner
 //        Evaluator eval = new Evaluator(populationSize, organism, nodeInnovation, connectionInnovation){
 //            @Override
 //            
-//            //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
+//            //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism/ run the neural network
 //            protected float evaluateGenome(Organism organism){
 //                
+
+                  //organism has a list of its connection genes and its nodes aka the neural network
+
 //                runOrganism(argv,organism);
 
-                  //see how well it did, return a score for it
+                  //Run the organism and evaluate the network
 
-//                //RUN THIS ORGANISM HERE THIS IS WHERE I WANT TO PUT THE DO WHILE CODE
+                
+
 //                
 //                
-//                return organism.getConnectionGenes().values().size();
+//                //return a score for the network
 //            }
 //        };
 //        
@@ -224,11 +238,65 @@ public class Runner
             
         do {
             
-            ////////////randomized///////////////
+            
+             //////////GET OBSERVATIONS/////////////
+            
+            double life;
+            double xPos;
+            double zPos;
+            int mobKilled;
+            int damageTaken;
+            int damageDealt;
+            int timeAlive;
+            
+            if(world_state.getObservations().size() > 0){
+                System.out.println(world_state.getObservations().get(0).getText());
+               
+                JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
+                life = root.getInt("Life");
+                xPos = root.getInt("XPos");
+                zPos = root.getInt("ZPos");
+                mobKilled = root.getInt("MobsKilled");
+                damageTaken = root.getInt("DamageTaken");
+                damageDealt = root.getInt("DamageDealt");
+                timeAlive = root.getInt("TimeAlive");
+                
+                //there are nearby things AKA figure out where the zombie is
+//                if(root.has("Entities")){
+//                    JSONArray theInfo = root.getJSONArray("Entities");
+//                    int length = theInfo.length() -1;
+//                   
+//                    while(length > -1){
+//                        JSONObject theEntity = theInfo.getJSONObject(length);
+//                        
+//                        System.out.println(theEntity);
+//                        
+//                        
+//                        if(theEntity.getString("name") == "Zombie"){
+//                            //the entity is the zombie here.
+//                            System.out.println("we found the zombie");
+//                            
+//                            System.out.println("The name is: " + theEntity.getString("name"));
+//                            System.out.println("The zombies' lifepoints are: " + theEntity.getString("life"));
+//                            System.out.println("The zombies coordinates are: " + theEntity.getString("x") + " , " + theEntity.getString("z"));
+//   
+//                        }
+//                        length--;
+//                    }
+//                }
+                
+                System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+                
+            }
+            
+            
+            
+            
+            ////////////randomized outputs for right now///////////////
             agent_host.sendCommand( "turn 0");
             agent_host.sendCommand( "move 0" );
             Random r = new Random();
-            int x = Math.abs(r.nextInt() % 5) + 1;
+            int x = Math.abs(r.nextInt() % 5) + 6;
             
             System.out.println(outputButtonNames.get(x));
             agent_host.sendCommand(outputButtonNames.get(x));
@@ -244,24 +312,11 @@ public class Runner
             
             world_state = agent_host.getWorldState();
 
-            for( int i = 0; i < world_state.getRewards().size(); i++ ) {
-                TimestampedReward reward = world_state.getRewards().get(i);
-                System.out.println( "Summed reward: " + reward.getValue() );
-            }
             for( int i = 0; i < world_state.getErrors().size(); i++ ) {
                 TimestampedString error = world_state.getErrors().get(i);
                 System.err.println( "Error: " + error.getText() );
             }
-           
-            //THIS IS JSON
-            //if the obeservations have started
-            if(world_state.getObservations().size() > 0){
-                System.out.println(world_state.getObservations().get(0).getText());
-               
-                JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
-                
-            }
-     
+              
             
         } while(world_state.getIsMissionRunning() );
 
