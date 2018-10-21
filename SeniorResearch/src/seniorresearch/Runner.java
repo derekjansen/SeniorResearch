@@ -10,16 +10,27 @@ package seniorresearch;
 import com.microsoft.msr.malmo.*;
 import java.io.File;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import neat.ConnectionGene;
+import neat.Counter;
+import neat.Organism;
+import neat.NodeGene;
 import org.w3c.dom.Document;
+import org.json.*;
 
 public class Runner
 {
+    static Map<Integer,String> outputButtonNames;
+    
+    
     static
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
@@ -31,15 +42,92 @@ public class Runner
         //////////////////SET UP NEAT CODE/////////////////////
         
         
+         Map<Integer,String> inputButtonNames = new HashMap();
+        outputButtonNames = new HashMap();
         
         
         
+        int populationSize = 25;
+        Counter nodeInnovation = new Counter();
+        Counter connectionInnovation = new Counter();
+        
+        //make a new organism
+        Organism organism = new Organism();
+        
+        //create nodeGenes
+        int n1 = nodeInnovation.getInnovation();
+        int n2 = nodeInnovation.getInnovation();
+        int n3 = nodeInnovation.getInnovation();
+        int n4 = nodeInnovation.getInnovation();
+        int n5 = nodeInnovation.getInnovation();
+        int n6 = nodeInnovation.getInnovation();
+        
+        
+        //inputs
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
+
+        
+        //map the outputs to their movement "buttons"
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n2));
+        outputButtonNames.put(n2,"move 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n3));
+        outputButtonNames.put(n3,"move -1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n4));
+        outputButtonNames.put(n4,"turn 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n5));
+        outputButtonNames.put(n5,"turn -1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n6));
+        outputButtonNames.put(n6,"attack 1");
         
         
         
+        //create connectionGenes
+        int c1 = connectionInnovation.getInnovation();
+        //add these to the organism
+        organism.addConnectionGene(new ConnectionGene(n1,n3,0.5f,true,c1));
+        
+//        
+//        
+//        
+//        //create evaluator and pass in the popSize, the starting organism, and the counters for the two types of connections
+//        Evaluator eval = new Evaluator(populationSize, organism, nodeInnovation, connectionInnovation){
+//            @Override
+//            
+//            //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
+//            protected float evaluateGenome(Organism organism){
+//                
+//                runOrganism(argv,organism);
+
+                  //see how well it did, return a score for it
+
+//                //RUN THIS ORGANISM HERE THIS IS WHERE I WANT TO PUT THE DO WHILE CODE
+//                
+//                
+//                return organism.getConnectionGenes().values().size();
+//            }
+//        };
+//        
+//        
+//        
+//        //run for 100 generations
+//        for(int i = 0; i < 100; i++){
+//            eval.evaluate();
+//            System.out.print("Generation: " + i);
+//            System.out.print("\tHighest fitness: " + eval.getHighestFitness());
+//            System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
+//        } 
+    
+        
+        runOrganism(argv,organism);
         
         
-        ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
+        
+     
+    }
+    
+    static private void runOrganism(String argv[], Organism organism) throws Exception{
+        
+         ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
         AgentHost agent_host = new AgentHost();
         try
@@ -130,38 +218,28 @@ public class Runner
        
         
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
-        //Spawn zmobie in the corner
+
+        //Spawn zombie in the corner
         agent_host.sendCommand("chat /summon zombie -11 228 -11");
             
-         
-          
-        
         do {
             
+            ////////////randomized///////////////
+            agent_host.sendCommand( "turn 0");
+            agent_host.sendCommand( "move 0" );
+            Random r = new Random();
+            int x = Math.abs(r.nextInt() % 5) + 1;
             
+            System.out.println(outputButtonNames.get(x));
+            agent_host.sendCommand(outputButtonNames.get(x));
             
-            
-            //WHY DOES IT JUMP SO FAR
-            
-            
-            agent_host.sendCommand( "move 1" );
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
                 return;
             }
-            
 
-            
-            agent_host.sendCommand( "turn 1" );
-            try {
-                Thread.sleep(500);
-            } catch(InterruptedException ex) {
-                System.err.println( "User interrupted while mission was running." );
-                return;
-            }
-            
             
             
             world_state = agent_host.getWorldState();
@@ -175,20 +253,21 @@ public class Runner
                 System.err.println( "Error: " + error.getText() );
             }
            
-        
-           
-            System.out.println(world_state.getObservations().get(0).getText());
+            //THIS IS JSON
+            //if the obeservations have started
+            if(world_state.getObservations().size() > 0){
+                System.out.println(world_state.getObservations().get(0).getText());
+               
+                JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
+                
+            }
+     
             
-
-             
-            
-              
         } while(world_state.getIsMissionRunning() );
 
         System.out.println( "Mission has stopped." );
+        
     }
-    
-    
     
     
     

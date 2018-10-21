@@ -20,27 +20,27 @@ public abstract class Evaluator implements Tuning{
 	
 	private int populationSize;
 	
-	private List<Genome> genomes;
-	private List<Genome> nextGenGenomes;
+	private List<Organism> organisms;
+	private List<Organism> nextGenOrganisms;
 	
 	private List<Species> species;
 	
-	private Map<Genome, Species> mappedSpecies;
-	private Map<Genome, Float> scoreMap;
+	private Map<Organism, Species> mappedSpecies;
+	private Map<Organism, Float> scoreMap;
 	private float highestScore;
-	private Genome mostFitGenome;
+	private Organism mostFitOrganism;
 	
-	public Evaluator(int populationSize, Genome startingGenome, Counter nodeInnovation, Counter connectionInnovation) {
+	public Evaluator(int populationSize, Organism startingGenome, Counter nodeInnovation, Counter connectionInnovation) {
 		this.populationSize = populationSize;
 		this.nodeInnovation = nodeInnovation;
 		this.connectionInnovation = connectionInnovation;
-		genomes = new ArrayList<Genome>(populationSize);
+		organisms = new ArrayList<Organism>(populationSize);
 		for (int i = 0; i < populationSize; i++) {
-			genomes.add(new Genome(startingGenome));
+			organisms.add(new Organism(startingGenome));
 		}
-		nextGenGenomes = new ArrayList<Genome>(populationSize);
-		mappedSpecies = new HashMap<Genome, Species>();
-		scoreMap = new HashMap<Genome, Float>();
+		nextGenOrganisms = new ArrayList<Organism>(populationSize);
+		mappedSpecies = new HashMap<Organism, Species>();
+		scoreMap = new HashMap<Organism, Float>();
 		species = new ArrayList<Species>();
 	}
 	
@@ -54,22 +54,22 @@ public abstract class Evaluator implements Tuning{
 		}
 		scoreMap.clear();
 		mappedSpecies.clear();
-		nextGenGenomes.clear();
+		nextGenOrganisms.clear();
 		highestScore = Float.MIN_VALUE;
-		mostFitGenome = null;
+		mostFitOrganism = null;
 		
-		// Place genomes into species
-		for (Genome g : genomes) {
+		// Place organisms into species
+		for (Organism g : organisms) {
 			boolean foundSpecies = false;
 			for (Species s : species) {
-				if (Utils.compatibilityDistance(g, s.mascot, C1, C2, C3) < DT) { // compatibility distance is less than DT, so genome belongs to this species
+				if (Utils.compatibilityDistance(g, s.mascot, C1, C2, C3) < DT) { // compatibility distance is less than DT, so organism belongs to this species
 					s.members.add(g);
 					mappedSpecies.put(g, s);
 					foundSpecies = true;
 					break;
 				}
 			}
-			if (!foundSpecies) { // if there is no appropiate species for genome, make a new one
+			if (!foundSpecies) { // if there is no appropiate species for organism, make a new one
 				Species newSpecies = new Species(g);
 				species.add(newSpecies);
 				mappedSpecies.put(g, newSpecies);
@@ -84,12 +84,13 @@ public abstract class Evaluator implements Tuning{
 				iter.remove();
 			}
 		}
-		
-		// Evaluate genomes and assign score
-		for (Genome g : genomes) {
-			Species s = mappedSpecies.get(g);		// Get species of the genome
+	
+// Evaluate organisms and assign score --- CALLS the evaulate Genome method.
+		for (Organism g : organisms) {
+			Species s = mappedSpecies.get(g);		// Get species of the organism
 			
 			float score = evaluateGenome(g);
+                        //adjust based on size of the species
 			float adjustedScore = score / mappedSpecies.get(g).members.size();
 			
 			s.addAdjustedFitness(adjustedScore);	
@@ -97,30 +98,32 @@ public abstract class Evaluator implements Tuning{
 			scoreMap.put(g, adjustedScore);
 			if (score > highestScore) {
 				highestScore = score;
-				mostFitGenome = g;
+				mostFitOrganism = g;
 			}
 		}
 		
-		// put best genomes from each species into next generation
+                
+		// put best organisms from each species into next generation
 		for (Species s : species) {
 			Collections.sort(s.fitnessPop, fitComp);
 			Collections.reverse(s.fitnessPop);
 			FitnessGenome mostFitInSpecies = s.fitnessPop.get(0);
-			nextGenGenomes.add(mostFitInSpecies.genome);
+			nextGenOrganisms.add(mostFitInSpecies.organism);
 		}
 		
-		// Breed the rest of the genomes
-		while (nextGenGenomes.size() < populationSize) { // replace removed genomes by randomly breeding
+                
+		// Breed the rest of the organisms
+		while (nextGenOrganisms.size() < populationSize) { // replace removed organisms by randomly breeding
 			Species s = getRandomSpeciesBiasedAjdustedFitness(random);
 			
-			Genome p1 = getRandomGenomeBiasedAdjustedFitness(s, random);
-			Genome p2 = getRandomGenomeBiasedAdjustedFitness(s, random);
+			Organism p1 = getRandomGenomeBiasedAdjustedFitness(s, random);
+			Organism p2 = getRandomGenomeBiasedAdjustedFitness(s, random);
 			
-			Genome child;
+			Organism child;
 			if (scoreMap.get(p1) >= scoreMap.get(p2)) {
-				child = Genome.crossover(p1, p2, random);
+				child = Organism.crossover(p1, p2, random);
 			} else {
-				child = Genome.crossover(p2, p1, random);
+				child = Organism.crossover(p2, p1, random);
 			}
 			if (random.nextFloat() < MUTATION_RATE) {
 				child.mutation(random);
@@ -133,13 +136,15 @@ public abstract class Evaluator implements Tuning{
 				//System.out.println("Adding node mutation...");
 				child.addNodeMutation(random, connectionInnovation, nodeInnovation);
 			}
-			nextGenGenomes.add(child);
+			nextGenOrganisms.add(child);
 		}
 		
-		genomes = nextGenGenomes;
-		nextGenGenomes = new ArrayList<Genome>();
+		organisms = nextGenOrganisms;
+		nextGenOrganisms = new ArrayList<Organism>();
 	}
 	
+        
+        
 	/**
 	 * Selects a random species from the species list, where species with a higher total adjusted fitness have a higher chance of being selected
 	 */
@@ -159,11 +164,13 @@ public abstract class Evaluator implements Tuning{
         throw new RuntimeException("Couldn't find a species... Number is species in total is "+species.size()+", and the total adjusted fitness is "+completeWeight);
 	}
 	
+        
+        
 	/**
-	 * Selects a random genome from the species chosen, where genomes with a higher adjusted fitness have a higher chance of being selected
+	 * Selects a random organism from the species chosen, where organisms with a higher adjusted fitness have a higher chance of being selected
 	 */
-	private Genome getRandomGenomeBiasedAdjustedFitness(Species selectFrom, Random random) {
-		double completeWeight = 0.0;	// sum of probablities of selecting each genome - selection is more probable for genomes with higher fitness
+	private Organism getRandomGenomeBiasedAdjustedFitness(Species selectFrom, Random random) {
+		double completeWeight = 0.0;	// sum of probablities of selecting each organism - selection is more probable for organisms with higher fitness
 		for (FitnessGenome fg : selectFrom.fitnessPop) {
 			completeWeight += fg.fitness;
 		}
@@ -172,10 +179,10 @@ public abstract class Evaluator implements Tuning{
         for (FitnessGenome fg : selectFrom.fitnessPop) {
             countWeight += fg.fitness;
             if (countWeight >= r) {
-            	 return fg.genome;
+            	 return fg.organism;
             }
         }
-        throw new RuntimeException("Couldn't find a genome... Number is genomes in selected species is "+selectFrom.fitnessPop.size()+", and the total adjusted fitness is "+completeWeight);
+        throw new RuntimeException("Couldn't find a organism... Number is organisms in selected species is "+selectFrom.fitnessPop.size()+", and the total adjusted fitness is "+completeWeight);
 	}
 	
 	public int getSpeciesAmount() {
@@ -186,19 +193,23 @@ public abstract class Evaluator implements Tuning{
 		return highestScore;
 	}
 	
-	public Genome getFittestGenome() {
-		return mostFitGenome;
+	public Organism getFittestGenome() {
+		return mostFitOrganism;
 	}
 	
-	protected abstract float evaluateGenome(Genome genome);
+        public List<Organism> getGenomeList(){
+            return organisms;
+        }
+        
+	protected abstract float evaluateGenome(Organism organism);
 	
 	public class FitnessGenome {
 		
 		float fitness;
-		Genome genome;
+		Organism organism;
 		
-		public FitnessGenome(Genome genome, float fitness) {
-			this.genome = genome;
+		public FitnessGenome(Organism organism, float fitness) {
+			this.organism = organism;
 			this.fitness = fitness;
 		}
 	}
@@ -217,5 +228,5 @@ public abstract class Evaluator implements Tuning{
 			return 0;
 		}
 		
-	}
+	}    
 }

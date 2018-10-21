@@ -19,7 +19,7 @@ public interface Utils {
 	public static List<Integer> tmpList2 = new ArrayList<Integer>();
     
     
-    public static float compatibilityDistance(Genome genome1, Genome genome2, float c1, float c2, float c3) {
+    public static float compatibilityDistance(Organism genome1, Organism genome2, float c1, float c2, float c3) {
 		int excessGenes = countExcessGenes(genome1, genome2);
 		int disjointGenes = countDisjointGenes(genome1, genome2);
 		float avgWeightDiff = averageWeightDiff(genome1, genome2);
@@ -27,7 +27,7 @@ public interface Utils {
 		return excessGenes * c1 + disjointGenes * c2 + avgWeightDiff * c3;
 	}
 	
-	public static int countMatchingGenes(Genome genome1, Genome genome2) {
+	public static int countMatchingGenes(Organism genome1, Organism genome2) {
 		int matchingGenes = 0;
 		
 		List<Integer> nodeKeys1 = asSortedList(genome1.getNodeGenes().keySet(), tmpList1);
@@ -65,7 +65,7 @@ public interface Utils {
 		return matchingGenes;
 	}
 	
-	public static int countDisjointGenes(Genome genome1, Genome genome2) {
+	public static int countDisjointGenes(Organism genome1, Organism genome2) {
 		int disjointGenes = 0;
 		
 		List<Integer> nodeKeys1 = asSortedList(genome1.getNodeGenes().keySet(), tmpList1);
@@ -106,7 +106,7 @@ public interface Utils {
 		return disjointGenes;
 	}
 	
-	public static int countExcessGenes(Genome genome1, Genome genome2) {
+	public static int countExcessGenes(Organism genome1, Organism genome2) {
 		int excessGenes = 0;
 		
 		List<Integer> nodeKeys1 = asSortedList(genome1.getNodeGenes().keySet(), tmpList1);
@@ -146,7 +146,7 @@ public interface Utils {
 		return excessGenes;
 	}
 	
-	public static float averageWeightDiff(Genome genome1, Genome genome2) {
+	public static float averageWeightDiff(Organism genome1, Organism genome2) {
 		int matchingGenes = 0;
 		float weightDifference = 0;
 		

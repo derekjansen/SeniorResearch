@@ -5,18 +5,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import neat.Evaluator;
-import neat.Genome;
+import neat.Organism;
 
 public class Species {
 		
-		public Genome mascot;
-		public List<Genome> members;
+		public Organism mascot;
+		public List<Organism> members;
 		public List<Evaluator.FitnessGenome> fitnessPop;
 		public float totalAdjustedFitness = 0f;
 		
-		public Species(Genome mascot) {
+		public Species(Organism mascot) {
 			this.mascot = mascot;
-			this.members = new LinkedList<Genome>(); 
+			this.members = new LinkedList<Organism>(); 
 			this.members.add(mascot);
 			this.fitnessPop = new ArrayList<Evaluator.FitnessGenome>(); 
 		}

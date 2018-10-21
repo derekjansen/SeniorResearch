@@ -36,7 +36,11 @@
         </AgentStart>
         <AgentHandlers>
             <ChatCommands/>
-            <DiscreteMovementCommands/>
+            <ContinuousMovementCommands/>
+            <ObservationFromNearbyEntities>
+                <Range name="theEntity" xrange="3" yrange="1" zrange="3" update_frequency="20"/>
+               
+            </ObservationFromNearbyEntities>
          <!--   <ObservationFromGrid>
                 <Grid name="floor3x3">
                     <min x="-1" y="-1" z="-1"/>
