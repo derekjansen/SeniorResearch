@@ -20,7 +20,6 @@ import neat.NodeGene.TYPE;
 public class Test {
     public static void main(String argv[]){
         
-        int populationSize = 100;
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
         
@@ -47,7 +46,7 @@ public class Test {
         
         
         //create evaluator and pass in the popSize, the starting organism, and the counters for the two types of connections
-        Evaluator eval = new Evaluator(populationSize, organism, nodeInnovation, connectionInnovation){
+        Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
             
             protected float evaluateGenome(Organism organism){

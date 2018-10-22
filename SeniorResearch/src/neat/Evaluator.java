@@ -18,7 +18,6 @@ public abstract class Evaluator implements Tuning{
 	
 	private Random random = new Random();
 	
-	private int populationSize;
 	
 	private List<Organism> organisms;
 	private List<Organism> nextGenOrganisms;
@@ -30,8 +29,7 @@ public abstract class Evaluator implements Tuning{
 	private float highestScore;
 	private Organism mostFitOrganism;
 	
-	public Evaluator(int populationSize, Organism startingGenome, Counter nodeInnovation, Counter connectionInnovation) {
-		this.populationSize = populationSize;
+	public Evaluator(Organism startingGenome, Counter nodeInnovation, Counter connectionInnovation) {
 		this.nodeInnovation = nodeInnovation;
 		this.connectionInnovation = connectionInnovation;
 		organisms = new ArrayList<Organism>(populationSize);
@@ -77,13 +75,7 @@ public abstract class Evaluator implements Tuning{
 		}
 		
 		// Remove unused species
-		Iterator<Species> iter = species.iterator();
-		while(iter.hasNext()) {
-			Species s = iter.next();
-			if (s.members.isEmpty()) {
-				iter.remove();
-			}
-		}
+		removeEmptySpecies();
 	
 // Evaluate organisms and assign score --- CALLS the evaulate Genome method.
 		for (Organism g : organisms) {
@@ -143,6 +135,15 @@ public abstract class Evaluator implements Tuning{
 		nextGenOrganisms = new ArrayList<Organism>();
 	}
 	
+        private void removeEmptySpecies() {
+		Iterator<Species> iter = species.iterator();
+		while(iter.hasNext()) {
+			Species s = iter.next();
+			if (s.members.isEmpty()) {
+				iter.remove();
+			}
+		}
+	}
         
         
 	/**

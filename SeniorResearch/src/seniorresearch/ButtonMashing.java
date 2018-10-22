@@ -11,7 +11,7 @@ import static seniorresearch.XmlConversionMethods.createMissionString;
 public class ButtonMashing implements XmlConversionMethods
 {
     static Map<Integer,String> outputButtonNames;
-    static double score;
+    static double highestScore;
     
     static
     {        
@@ -26,19 +26,22 @@ public class ButtonMashing implements XmlConversionMethods
         outputButtonNames.put(2,"turn 1");
         outputButtonNames.put(3,"turn -1");
         outputButtonNames.put(4,"attack 1");
-        score = 0.0;
+        highestScore = 0.0;
         
          //run for 10 organisms
+        double tempScore = 0;
         for(int i = 0; i < 5; i++){
-            System.out.println("Run Started: " + i);
-            runOrganism();
-
+            System.out.println("Run Started for Organism: " + i);
+            tempScore = runOrganism();
+            System.out.println("The score for this organism: " + tempScore);
+            if(tempScore > highestScore)
+                highestScore = tempScore;
         } 
         
      
     }
     
-    static private void runOrganism() throws Exception{
+    static private float runOrganism() throws Exception{
         
          ///////////////////////////////////// SET UP THE WORLD AND THE MALMO AGENT /////////////////////////////////
         
@@ -79,7 +82,7 @@ public class ButtonMashing implements XmlConversionMethods
                 Thread.sleep(100);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while waiting for mission to start." );
-                return;
+                return 0;
             }
             world_state = agent_host.getWorldState();
             for( int i = 0; i < world_state.getErrors().size(); i++ )
@@ -160,7 +163,7 @@ public class ButtonMashing implements XmlConversionMethods
                 Thread.sleep(1000);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
-                return;
+                return 0;
             }
 
             
@@ -175,7 +178,11 @@ public class ButtonMashing implements XmlConversionMethods
         } while(world_state.getIsMissionRunning() );
 
         System.out.println( "Mission has stopped." );
+       
         
+        
+        //calulate score here
+        return 0;
     }
     
     

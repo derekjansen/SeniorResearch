@@ -35,7 +35,6 @@ public class Runner implements XmlConversionMethods
         
         
         
-        int populationSize = 2;
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
         
@@ -93,7 +92,7 @@ public class Runner implements XmlConversionMethods
         
         
          //create evaluator and pass in the popSize, the starting organism, and the counters for the two types of connections
-        Evaluator eval = new Evaluator(populationSize, organism, nodeInnovation, connectionInnovation){
+        Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
             
             //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
@@ -219,28 +218,25 @@ public class Runner implements XmlConversionMethods
                 timeAlive = root.getInt("TimeAlive");
                 
                 //there are nearby things AKA figure out where the zombie is
-//                if(root.has("Entities")){
-//                    JSONArray theInfo = root.getJSONArray("Entities");
-//                    int length = theInfo.length() -1;
-//                   
-//                    while(length > -1){
-//                        JSONObject theEntity = theInfo.getJSONObject(length);
-//                        
-//                        System.out.println(theEntity);
-//                        
-//                        
-//                        if(theEntity.getString("name") == "Zombie"){
-//                            //the entity is the zombie here.
-//                            System.out.println("we found the zombie");
-//                            
-//                            System.out.println("The name is: " + theEntity.getString("name"));
-//                            System.out.println("The zombies' lifepoints are: " + theEntity.getString("life"));
-//                            System.out.println("The zombies coordinates are: " + theEntity.getString("x") + " , " + theEntity.getString("z"));
-//   
-//                        }
-//                        length--;
-//                    }
-//                }
+                if(root.has("Entities")){
+                    //get array
+                    JSONArray theEntityArray = root.getJSONArray("Entities");
+                    int i = theEntityArray.length() -1;
+                   
+                    while(i > -1){
+                        JSONObject theEntity = theEntityArray.getJSONObject(i);
+           
+                        if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
+                            //the entity is the zombie here.
+                            System.out.println("we found the zombie");
+                            System.out.println(theEntity);
+                            System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
+                            System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
+   
+                        }
+                        i--;
+                    }
+                }
                 
                 System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                 
@@ -278,6 +274,7 @@ public class Runner implements XmlConversionMethods
 
         System.out.println( "Mission has stopped." );
         
+        //calculate score here
         return 0f;
         
     }

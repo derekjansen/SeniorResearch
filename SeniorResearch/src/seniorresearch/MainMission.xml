@@ -6,7 +6,7 @@
     <ServerSection>
         <ServerInitialConditions>
             <Time>
-                <StartTime>15000</StartTime>
+                <StartTime>10000</StartTime>
                 <AllowPassageOfTime>false</AllowPassageOfTime>
             </Time>
         </ServerInitialConditions>
