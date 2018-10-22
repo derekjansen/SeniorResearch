@@ -50,12 +50,9 @@ public class Test {
         Evaluator eval = new Evaluator(populationSize, organism, nodeInnovation, connectionInnovation){
             @Override
             
-            //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
             protected float evaluateGenome(Organism organism){
                 
-                
-                //RUN THIS ORGANISM HERE THIS IS WHERE I WANT TO PUT THE DO WHILE CODE
-                
+                                
                 
                 return organism.getConnectionGenes().values().size();
             }

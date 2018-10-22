@@ -1,25 +1,20 @@
 
 package seniorresearch;
 import com.microsoft.msr.malmo.*;
-import java.io.File;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import neat.ConnectionGene;
 import neat.Counter;
+import neat.Evaluator;
 import neat.Organism;
 import neat.NodeGene;
-import org.w3c.dom.Document;
 import org.json.*;
+import static seniorresearch.XmlConversionMethods.createMissionString;
 
-public class Runner
+public class Runner implements XmlConversionMethods
 {
     static Map<Integer,String> outputButtonNames;
     static Map<Integer,String> inputButtonNames;
@@ -40,7 +35,7 @@ public class Runner
         
         
         
-        int populationSize = 25;
+        int populationSize = 2;
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
         
@@ -61,7 +56,7 @@ public class Runner
         int n11 = nodeInnovation.getInnovation();
         int n12 = nodeInnovation.getInnovation();
         
-        //inputs
+        //number of input node is associated with the type of input
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
         inputButtonNames.put(n1, "Life");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n2));
@@ -77,7 +72,7 @@ public class Runner
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n7));
         inputButtonNames.put(n7, "TimeAlive");
                 
-        //map the outputs to their movement "buttons"
+        //number of output node is associated with the "buttons" that can be pressed
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n8));
         outputButtonNames.put(n8,"move 1");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n9));
@@ -94,100 +89,62 @@ public class Runner
         //create connectionGenes
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n1,n3,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n1,n8,0.5f,true,c1));
         
-//        
-//        
-//        
-//        //create evaluator and pass in the popSize, the starting organism, and the counters for the two types of connections
-//        Evaluator eval = new Evaluator(populationSize, organism, nodeInnovation, connectionInnovation){
-//            @Override
-//            
-//            //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism/ run the neural network
-//            protected float evaluateGenome(Organism organism){
-//                
-
-                  //organism has a list of its connection genes and its nodes aka the neural network
-
-//                runOrganism(argv,organism);
-
-                  //Run the organism and evaluate the network
-
+        
+         //create evaluator and pass in the popSize, the starting organism, and the counters for the two types of connections
+        Evaluator eval = new Evaluator(populationSize, organism, nodeInnovation, connectionInnovation){
+            @Override
+            
+            //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
+            protected float evaluateGenome(Organism organism){
+ 
+                try {
+                    //RUN THE ORGANISM HERE aka run the network and evaluate it. Return a score as a float
+                    
+                    return runOrganism(organism);
+                    
+                    
+                } catch (Exception ex) {
+                    Logger.getLogger(Runner.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
-
-//                
-//                
-//                //return a score for the network
-//            }
-//        };
-//        
-//        
-//        
-//        //run for 100 generations
-//        for(int i = 0; i < 100; i++){
-//            eval.evaluate();
-//            System.out.print("Generation: " + i);
-//            System.out.print("\tHighest fitness: " + eval.getHighestFitness());
-//            System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
-//        } 
+                return 0;
+ 
+            }
+        };
+        
+        
+        
+        
+        //run for 10 generations and print out scores and such
+        for(int i = 0; i < 10; i++){
+            
+            eval.evaluate();
+            
+            System.out.print("Generation: " + i);
+            System.out.print("\tHighest fitness: " + eval.getHighestFitness());
+            System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
+        } 
     
         
-        runOrganism(argv,organism);
         
         
         
      
     }
     
-    static private void runOrganism(String argv[], Organism organism) throws Exception{
+    
+    
+    
+    
+    static private float runOrganism(Organism organism) throws Exception{
         
          ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
         AgentHost agent_host = new AgentHost();
-        try
-        {
-            StringVector args = new StringVector();
-            args.add("JavaExamples_run_mission");
-            for( String arg : argv )
-                args.add( arg );
-            agent_host.parse( args );
-        }
-        catch( Exception e )
-        {
-            System.err.println( "ERROR: " + e.getMessage() );
-            System.err.println( agent_host.getUsage() );
-            System.exit(1);
-        }
-        if( agent_host.receivedArgument("help") )
-        {
-            System.out.println( agent_host.getUsage() );
-            System.exit(0);
-        }
         
-        //new 
-        
-        final String xmlFilePath = "/Users/derekgrove/NetBeansProjects/SeniorResearch/SeniorResearch/src/seniorresearch/MainMission.xml";
-        Document xmlDoc = convertXMLFileToXMLDocument(xmlFilePath);
-        
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer;
-        String missionXmlString;
-        try {
-            transformer = tf.newTransformer();
-            
-            // Uncomment if you do not require XML declaration
-            // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            
-            //Print XML or Logs or Console
-            StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(xmlDoc), new StreamResult(writer));
-             missionXmlString = writer.getBuffer().toString();	
-           		
-        }catch(Exception e){
-            System.out.println("Conversion from xml to string errored out");
-            missionXmlString = null; 
-        }
-        
+        String missionXmlString = createMissionString();
         MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
@@ -221,7 +178,7 @@ public class Runner
                 Thread.sleep(100);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while waiting for mission to start." );
-                return;
+                return 0;
             }
             world_state = agent_host.getWorldState();
             for( int i = 0; i < world_state.getErrors().size(); i++ )
@@ -231,13 +188,13 @@ public class Runner
 
        
         
-        ////////////////////////// MAIN LOOP ///////////////////////////////////// 
+        //////////////////////////// MAIN LOOP ////////////////////////////////////////////////////////// 
 
         //Spawn zombie in the corner
         agent_host.sendCommand("chat /summon zombie -11 228 -11");
             
-        do {
-            
+    do {
+           
             
              //////////GET OBSERVATIONS/////////////
             
@@ -291,13 +248,12 @@ public class Runner
             
             
             
-            
             ////////////randomized outputs for right now///////////////
             agent_host.sendCommand( "turn 0");
             agent_host.sendCommand( "move 0" );
             Random r = new Random();
-            int x = Math.abs(r.nextInt() % 5) + 6;
-            
+            int x = Math.abs(r.nextInt() % 5) + 7;
+            System.out.println(x);
             System.out.println(outputButtonNames.get(x));
             agent_host.sendCommand(outputButtonNames.get(x));
             
@@ -305,7 +261,7 @@ public class Runner
                 Thread.sleep(1000);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
-                return;
+                return 0;
             }
 
             
@@ -322,36 +278,9 @@ public class Runner
 
         System.out.println( "Mission has stopped." );
         
+        return 0f;
+        
     }
-    
-    
-    
-    
-    
-    
-    
-        private static Document convertXMLFileToXMLDocument(String filePath) 
-{
-	//Parser that produces DOM object trees from XML content
-	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	
-	//API to obtain DOM Document instance
-	DocumentBuilder builder = null;
-	try 
-	{
-		//Create DocumentBuilder with default configuration
-		builder = factory.newDocumentBuilder();
-		
-		//Parse the content to Document object
-		Document xmlDocument = builder.parse(new File(filePath));
-		
-		return xmlDocument;
-	} 
-	catch (Exception e) 
-	{
-		e.printStackTrace();
-	}
-	return null;
-}
+       
 }
 
