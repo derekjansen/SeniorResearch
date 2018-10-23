@@ -6,7 +6,7 @@
     <ServerSection>
         <ServerInitialConditions>
             <Time>
-                <StartTime>10000</StartTime>
+                <StartTime>1000</StartTime>
                 <AllowPassageOfTime>false</AllowPassageOfTime>
             </Time>
         </ServerInitialConditions>
@@ -17,25 +17,25 @@
                 <DrawLine x1="2" y1="227" z1="-12" x2="-12" y2="227" z2="-12" type="stone" />
                 <DrawLine x1="-12" y1="227" z1="-12" x2="-12" y2="227" z2="2" type="stone" />
                 <DrawLine x1="-12" y1="227" z1="2" x2="2" y2="227" z2="2" type="stone" />
-                <DrawLine x1="2" y1="228" z1="2" x2="2" y2="228" z2="-12" type="glass"/>
-                <DrawLine x1="2" y1="228" z1="-12" x2="-12" y2="228" z2="-12" type="glass" />
-                <DrawLine x1="-12" y1="228" z1="-12" x2="-12" y2="228" z2="2" type="glass" />
-                <DrawLine x1="-12" y1="228" z1="2" x2="2" y2="228" z2="2" type="glass" />
+                <DrawLine x1="2" y1="229" z1="2" x2="2" y2="229" z2="-12" type="glass"/>
+                <DrawLine x1="2" y1="229" z1="-12" x2="-12" y2="229" z2="-12" type="glass" />
+                <DrawLine x1="-12" y1="229" z1="-12" x2="-12" y2="229" z2="2" type="glass" />
+                <DrawLine x1="-12" y1="229" z1="2" x2="2" y2="229" z2="2" type="glass" />
             </DrawingDecorator>
-            <ServerQuitFromTimeUp timeLimitMs="15000"/>
+            <ServerQuitFromTimeUp timeLimitMs="60000"/>
             <ServerQuitWhenAnyAgentFinishes/>
         </ServerHandlers>
     </ServerSection>
     <AgentSection>
         <Name>A default agent</Name>
         <AgentStart>
-            <Placement x="0" y="228" z="0" yaw="90"/>
+            <Placement x="3" y="230" z="3" yaw="135"/>
             <Inventory>
                 <InventoryItem slot="0" type="diamond_sword" />
-                <InventoryItem slot="39" type="diamond_helmet" />
+              <!--  <InventoryItem slot="39" type="diamond_helmet" />
                 <InventoryItem slot="38" type="diamond_chestplate" />
                 <InventoryItem slot="37" type="diamond_leggings" />
-                <InventoryItem slot="36" type="diamond_boots" />
+                <InventoryItem slot="36" type="diamond_boots" /> -->
             </Inventory>
         </AgentStart>
         <AgentHandlers>

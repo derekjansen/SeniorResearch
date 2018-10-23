@@ -11,8 +11,12 @@ import static seniorresearch.XmlConversionMethods.createMissionString;
 public class ButtonMashing implements XmlConversionMethods
 {
     static Map<Integer,String> outputButtonNames;
-    static double highestScore;
-    
+    static double highestScore = 0;
+   // static double oldLife = 0;
+    static int oldMobKilled = 0;
+    static int oldDamageTaken = 0;
+    static int oldDamageDealt = 0;
+    static int oldTimeAlive = 0;
     static
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
@@ -33,11 +37,11 @@ public class ButtonMashing implements XmlConversionMethods
         for(int i = 0; i < 5; i++){
             System.out.println("Run Started for Organism: " + i);
             tempScore = runOrganism();
-            System.out.println("The score for this organism: " + tempScore);
+            System.out.println("The score for this organism: " + tempScore + "\n");
             if(tempScore > highestScore)
                 highestScore = tempScore;
         } 
-        
+        System.out.println("The highest Fitness achieved was: " + highestScore);
      
     }
     
@@ -91,30 +95,40 @@ public class ButtonMashing implements XmlConversionMethods
         System.out.println( "" );
 
        
-        
+            double xPos = 0;
+            double zPos = 0;
+            //double life = 0;
+            int mobKilled = 0;
+            int damageTaken = 0;
+            int damageDealt = 0;
+            int timeAlive = 0;
+            
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
-
+        
+        //pause on daylight for a bit
+        try {
+                Thread.sleep(20000);
+            } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return 0;
+            }
+        agent_host.sendCommand("chat /tp 0 228 0");
+        //turn to night
+        agent_host.sendCommand("chat /time set 15000");
         //Spawn zombie in the corner
         agent_host.sendCommand("chat /summon zombie -11 228 -11");
-            
+        
+        
         do {
             
             
              //////////GET OBSERVATIONS/////////////
             
-            double life;
-            double xPos;
-            double zPos;
-            int mobKilled;
-            int damageTaken;
-            int damageDealt;
-            int timeAlive;
-            
             if(world_state.getObservations().size() > 0){
                 System.out.println(world_state.getObservations().get(0).getText());
                
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
-                life = root.getDouble("Life");
+               // life = root.getDouble("Life");
                 xPos = root.getDouble("XPos");
                 zPos = root.getDouble("ZPos");
                 mobKilled = root.getInt("MobsKilled");
@@ -133,8 +147,8 @@ public class ButtonMashing implements XmlConversionMethods
            
                         if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
                             //the entity is the zombie here.
-                            System.out.println("we found the zombie");
-                            System.out.println(theEntity);
+                            System.out.println("Found the zombie");
+                          //  System.out.println(theEntity);
                             System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
                             System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
@@ -143,14 +157,14 @@ public class ButtonMashing implements XmlConversionMethods
                     }
                 }
                 
-                System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+                System.out.println("PLAYER STATS:    timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                 
             }
             
             
             
             
-            ////////////randomized outputs for right now///////////////
+            ////////////randomized outputs to mimic button mashing///////////////
             agent_host.sendCommand( "turn 0");
             agent_host.sendCommand( "move 0" );
             Random r = new Random();
@@ -159,15 +173,23 @@ public class ButtonMashing implements XmlConversionMethods
             System.out.println(outputButtonNames.get(x));
             agent_host.sendCommand(outputButtonNames.get(x));
             
+            //varied sleep time based on kind of command being sent
+            int sleepTime = 0;
+            if(x == 0 || x == 1){           //move
+                sleepTime = 1000;
+            } else if(x == 2 || x == 3){    //turn
+                sleepTime = 500;
+            } else{                         //attack
+                sleepTime = 100;
+            }
+            
             try {
-                Thread.sleep(1000);
+                Thread.sleep(sleepTime);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
                 return 0;
             }
 
-            
-            
             world_state = agent_host.getWorldState();
             for( int i = 0; i < world_state.getErrors().size(); i++ ) {
                 TimestampedString error = world_state.getErrors().get(i);
@@ -177,14 +199,35 @@ public class ButtonMashing implements XmlConversionMethods
             
         } while(world_state.getIsMissionRunning() );
 
+        
         System.out.println( "Mission has stopped." );
        
         
+        //FIX THESE CUZ THEY WACK
+        
+        
+        //get correct run scores since the stats for the organism persists between runs
+        timeAlive = timeAlive - oldTimeAlive;
+        oldTimeAlive = oldTimeAlive + timeAlive;
+        
+        damageDealt = damageDealt - oldDamageDealt;
+        oldDamageDealt = oldDamageDealt + damageDealt;
+        
+        damageTaken = damageTaken - oldDamageTaken;
+        oldDamageTaken = oldDamageTaken +damageTaken;
+        
+        mobKilled = mobKilled - oldMobKilled;
+        oldMobKilled = oldMobKilled + mobKilled;
+        
+        
+        System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
         //calulate score here
-        return 0;
+        return (float) ((1.0 * timeAlive) + (20.0 * damageDealt) + (50.0 * mobKilled) - (100.00 * damageTaken));
+        
+        
+        
     }
-    
     
     
 }
