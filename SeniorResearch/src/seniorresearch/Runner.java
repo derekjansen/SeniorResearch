@@ -100,7 +100,7 @@ public class Runner implements XmlConversionMethods
  
                 try {
                     //RUN THE ORGANISM HERE aka run the network and evaluate it. Return a score as a float
-                    
+                    //Run Neural Net
                     return runOrganism(organism);
                     
                     
