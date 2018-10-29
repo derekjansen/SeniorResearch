@@ -13,14 +13,22 @@
         <ServerHandlers>
             <FlatWorldGenerator generatorString="3;7,220*1,5*3,2;3;,biome_1"/>
             <DrawingDecorator>
-                <DrawLine x1="2" y1="227" z1="2" x2="2" y2="227" z2="-12" type="stone"/>
+                <DrawLine x1="15" y1="227" z1="15" x2="15" y2="227" z2="2" type="stone"/>
+                <DrawLine x1="15" y1="227" z1="2" x2="2" y2="227" z2="2" type="stone" />
+                <DrawLine x1="2" y1="227" z1="2" x2="2" y2="227" z2="15" type="stone" />
+                <DrawLine x1="2" y1="227" z1="15" x2="15" y2="227" z2="15" type="stone" />
+                <DrawLine x1="15" y1="229" z1="15" x2="15" y2="229" z2="2" type="glass"/>
+                <DrawLine x1="15" y1="229" z1="2" x2="2" y2="229" z2="2" type="glass" />
+                <DrawLine x1="2" y1="229" z1="2" x2="2" y2="229" z2="15" type="glass" />
+                <DrawLine x1="2" y1="229" z1="15" x2="15" y2="229" z2="15" type="glass" />
+              <!--  <DrawLine x1="2" y1="227" z1="2" x2="2" y2="227" z2="-12" type="stone"/>
                 <DrawLine x1="2" y1="227" z1="-12" x2="-12" y2="227" z2="-12" type="stone" />
                 <DrawLine x1="-12" y1="227" z1="-12" x2="-12" y2="227" z2="2" type="stone" />
                 <DrawLine x1="-12" y1="227" z1="2" x2="2" y2="227" z2="2" type="stone" />
                 <DrawLine x1="2" y1="229" z1="2" x2="2" y2="229" z2="-12" type="glass"/>
                 <DrawLine x1="2" y1="229" z1="-12" x2="-12" y2="229" z2="-12" type="glass" />
                 <DrawLine x1="-12" y1="229" z1="-12" x2="-12" y2="229" z2="2" type="glass" />
-                <DrawLine x1="-12" y1="229" z1="2" x2="2" y2="229" z2="2" type="glass" />
+                <DrawLine x1="-12" y1="229" z1="2" x2="2" y2="229" z2="2" type="glass" /> -->
             </DrawingDecorator>
             <ServerQuitFromTimeUp timeLimitMs="60000"/>
             <ServerQuitWhenAnyAgentFinishes/>
@@ -29,20 +37,20 @@
     <AgentSection>
         <Name>A default agent</Name>
         <AgentStart>
-            <Placement x="3" y="230" z="3" yaw="135"/>
+            <Placement x="3" y="230" z="3" yaw="315"/>
             <Inventory>
                 <InventoryItem slot="0" type="diamond_sword" />
-              <!--  <InventoryItem slot="39" type="diamond_helmet" />
+               <InventoryItem slot="39" type="diamond_helmet" />
                 <InventoryItem slot="38" type="diamond_chestplate" />
                 <InventoryItem slot="37" type="diamond_leggings" />
-                <InventoryItem slot="36" type="diamond_boots" /> -->
+                <InventoryItem slot="36" type="diamond_boots" />        
             </Inventory>
         </AgentStart>
         <AgentHandlers>
             <ChatCommands/>
             <ContinuousMovementCommands/>
             <ObservationFromNearbyEntities>
-                <Range name="Entities" xrange="5" yrange="1" zrange="5" update_frequency="20"/>
+                <Range name="Entities" xrange="10" yrange="2" zrange="10" update_frequency="20"/>
             </ObservationFromNearbyEntities>
             <ObservationFromFullStats/>
             <VideoProducer viewpoint="1">

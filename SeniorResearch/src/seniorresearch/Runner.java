@@ -99,8 +99,8 @@ public class Runner implements XmlConversionMethods
             protected float evaluateGenome(Organism organism){
  
                 try {
-                    //RUN THE ORGANISM HERE aka run the network and evaluate it. Return a score as a float
-                    //Run Neural Net
+                    //RUN THE ORGANISM HERE 
+                    //aka neural net evaluation
                     return runOrganism(organism);
                     
                     
@@ -124,13 +124,8 @@ public class Runner implements XmlConversionMethods
             System.out.print("Generation: " + i);
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
-        } 
-    
+        }         
         
-        
-        
-        
-     
     }
     
     

@@ -8,7 +8,7 @@ import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
 
 
-public class ButtonMashing implements XmlConversionMethods
+public class RuledBased implements XmlConversionMethods
 {
     static Map<Integer,String> outputButtonNames;
     static double highestScore = 0;
@@ -102,7 +102,8 @@ public class ButtonMashing implements XmlConversionMethods
             int damageTaken = 0;
             int damageDealt = 0;
             int timeAlive = 0;
-            
+            Double zombieXPos = null;
+            Double zombieZPos = null;
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         
         //pause on daylight for a bit
@@ -120,12 +121,13 @@ public class ButtonMashing implements XmlConversionMethods
         
         
         do {
-            
+                zombieXPos = null;
+                zombieZPos = null;        
             
              //////////GET OBSERVATIONS/////////////
             
             if(world_state.getObservations().size() > 0){
-                System.out.println(world_state.getObservations().get(0).getText());
+            //    System.out.println(world_state.getObservations().get(0).getText());
                
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
                // life = root.getDouble("Life");
@@ -148,7 +150,8 @@ public class ButtonMashing implements XmlConversionMethods
                         if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
                             //the entity is the zombie here.
                             System.out.println("Found the zombie");
-                          //  System.out.println(theEntity);
+                            zombieXPos = theEntity.getDouble("x");
+                            zombieZPos = theEntity.getDouble("z");
                             System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
                             System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
@@ -156,35 +159,58 @@ public class ButtonMashing implements XmlConversionMethods
                         i--;
                     }
                 }
-                
-                System.out.println("PLAYER STATS:    timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+               //have player stats and zombie position here
+               System.out.println("PLAYER STATS:    timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                 
             }
             
-            
-            
-            
-            ////////////randomized outputs to mimic button mashing///////////////
+            //stop
             agent_host.sendCommand( "turn 0");
             agent_host.sendCommand( "move 0" );
-            Random r = new Random();
-            int x = Math.abs(r.nextInt() % 5);
+            int sleeptime = 0;
+            //do things with some basic logic
             
-            System.out.println(outputButtonNames.get(x));
-            agent_host.sendCommand(outputButtonNames.get(x));
-            
-            //varied sleep time based on kind of command being sent
-            int sleepTime = 0;
-            if(x == 0 || x == 1){           //move
-                sleepTime = 1000;
-            } else if(x == 2 || x == 3){    //turn
-                sleepTime = 500;
-            } else{                         //attack
-                sleepTime = 100;
+            //saw zombie and know where it is
+            if(zombieXPos != null && zombieZPos != null){
+                double tempX = zombieXPos - xPos;
+                double tempZ = zombieZPos - zPos;
+                
+                if(tempX > 0 || tempZ > 0){
+                    agent_host.sendCommand("attack 1");
+                    agent_host.sendCommand("turn 1");
+                    System.out.println("Saw zombie: turn 1");
+                }else if (tempX < 0 || tempZ < 0){
+                    agent_host.sendCommand("attack 1");
+                    agent_host.sendCommand("turn -1");
+                     System.out.println("Saw zombie: turn -1");
+                }else{
+                    agent_host.sendCommand("attack 1");
+                }
+                  sleeptime = 25;  
+                
+            }else{  //no zombie in sight just move around
+                Random r = new Random();
+                int toDo = r.nextInt() % 5;
+                
+                if(toDo > 2){
+                    agent_host.sendCommand("move 1");
+                    sleeptime = 500;
+                }
+                else if(toDo == 1){
+                    agent_host.sendCommand("turn 1");
+                    sleeptime = 200;
+                }else{  //is 0
+                    agent_host.sendCommand("turn -1");
+                    sleeptime = 200;
+                }
             }
             
+            
+            
+            
+            
             try {
-                Thread.sleep(sleepTime);
+                Thread.sleep(sleeptime);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
                 return 0;
@@ -196,10 +222,7 @@ public class ButtonMashing implements XmlConversionMethods
                 System.err.println( "Error: " + error.getText() );
             }
               
-        //TRY COLLECTING TIME HERE    
-        timeAlive = timeAlive - oldTimeAlive;
-        oldTimeAlive = oldTimeAlive + timeAlive;
-        
+          
         } while(world_state.getIsMissionRunning() );
 
         
@@ -210,9 +233,11 @@ public class ButtonMashing implements XmlConversionMethods
         
         
         //get correct run scores since the stats for the organism persists between runs
-        timeAlive = timeAlive - oldTimeAlive;
-        oldTimeAlive = oldTimeAlive + timeAlive;
-        
+         timeAlive = timeAlive - oldTimeAlive;
+         if(oldTimeAlive != 0){
+            oldTimeAlive = oldTimeAlive + timeAlive; 
+         }
+         
         damageDealt = damageDealt - oldDamageDealt;
         oldDamageDealt = oldDamageDealt + damageDealt;
         
