@@ -1,5 +1,5 @@
 package neat;
-
+//
 public class ConnectionGene {
 	
 	private int inNode;

@@ -6,7 +6,7 @@
     <ServerSection>
         <ServerInitialConditions>
             <Time>
-                <StartTime>1000</StartTime>
+                <StartTime>15000</StartTime>
                 <AllowPassageOfTime>false</AllowPassageOfTime>
             </Time>
         </ServerInitialConditions>
@@ -34,7 +34,7 @@
     <AgentSection>
         <Name>A default agent</Name>
         <AgentStart>
-            <Placement x="-1" y="230" z="-1" yaw="315"/>
+            <Placement x="1" y="230" z="-1" yaw="90"/>
             <Inventory>
                 <InventoryItem slot="0" type="diamond_sword" />
                <InventoryItem slot="39" type="diamond_helmet" />

@@ -3,6 +3,7 @@ package neat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -85,13 +86,57 @@ public class Organism implements Utils{
 				reversed = true;
 			}
 			
+                        if (reversed) {
+				NodeGene tmp = node1;
+				node1 = node2;
+				node2 = tmp;
+			}
+                        
+                        
+                        
+                        
 			boolean connectionImpossible = false;
 			if (node1.getType() == NodeGene.TYPE.INPUT && node2.getType() == NodeGene.TYPE.INPUT) {
 				connectionImpossible = true;
 			} else if (node1.getType() == NodeGene.TYPE.OUTPUT && node2.getType() == NodeGene.TYPE.OUTPUT) {
 				connectionImpossible = true;
+			} else if (node1 == node2) {
+				connectionImpossible = true;
 			}
 			
+                        
+                        /* check for circular structures */
+			List<Integer> needsChecking = new LinkedList<Integer>(); 	// list of nodes that should have their connections checked
+			List<Integer> nodeIDs = new LinkedList<Integer>(); 			// list of nodes that requires output from node2
+			for (Integer connID : connections.keySet()) {
+				ConnectionGene gene = connections.get(connID);
+				if (gene.getInNode() == node2.getId()) { // connection comes from node2
+					nodeIDs.add(gene.getOutNode());
+					needsChecking.add(gene.getOutNode());
+				}
+			}
+			while (!needsChecking.isEmpty()) {
+				int nodeID = needsChecking.get(0);
+				for (Integer connID : connections.keySet()) {
+					ConnectionGene gene = connections.get(connID);
+					if (gene.getInNode() == nodeID) { // connection comes from the needsChecking node
+						nodeIDs.add(gene.getOutNode());
+						needsChecking.add(gene.getOutNode());
+					}
+				}
+				needsChecking.remove(0);
+			}
+			for (Integer i : nodeIDs) { // loop through dependent nodes
+				if (i == node1.getId()) { // if we make it here, then node1 calculation is dependent on node2 calculation, creating a deadlock
+					connectionImpossible = true;
+				}
+			}
+                        
+                        
+                        
+                        
+                        
+                        
 			boolean connectionExists = false;
 			for (ConnectionGene con : connections.values()) {
 				if (con.getInNode() == node1.getId() && con.getOutNode() == node2.getId()) { // existing connection
@@ -107,7 +152,7 @@ public class Organism implements Utils{
 				continue;
 			}
 			
-			ConnectionGene newCon = new ConnectionGene(reversed ? node2.getId() : node1.getId(), reversed ? node1.getId() : node2.getId(), weight, true, innovation.getInnovation());
+			ConnectionGene newCon = new ConnectionGene(node1.getId(), node2.getId(), weight, true, innovation.getInnovation());
 			connections.put(newCon.getInnovation(), newCon);
 			success = true;
 		}
@@ -144,12 +189,17 @@ public class Organism implements Utils{
 			child.addNodeGene(new NodeGene(parent1Node));
 		}
 		
-		for (ConnectionGene parent1Node : parent1.getConnectionGenes().values()) {
-			if (parent2.getConnectionGenes().containsKey(parent1Node.getInnovation())) { // matching gene
-				ConnectionGene childConGene = r.nextBoolean() ? new ConnectionGene(parent1Node) : new ConnectionGene(parent2.getConnectionGenes().get(parent1Node.getInnovation()));
+		for (ConnectionGene parent1Conn : parent1.getConnectionGenes().values()) {
+			if (parent2.getConnectionGenes().containsKey(parent1Conn.getInnovation())) { // matching gene
+				ConnectionGene parent2Conn = parent2.getConnectionGenes().get(parent1Conn.getInnovation());
+				boolean disabled = !parent1Conn.isExpressed() || !parent2Conn.isExpressed();
+				ConnectionGene childConGene = r.nextBoolean() ? new ConnectionGene(parent1Conn) : new ConnectionGene(parent2Conn);
+				if (disabled && r.nextFloat() > 0.3f) { // NOTE REMOVE HARDCODED VALUES
+					childConGene.disable();
+				}
 				child.addConnectionGene(childConGene);
 			} else { // disjoint or excess gene
-				ConnectionGene childConGene = new ConnectionGene(parent1Node);
+				ConnectionGene childConGene = new ConnectionGene(parent1Conn);
 				child.addConnectionGene(childConGene);
 			}
 		}

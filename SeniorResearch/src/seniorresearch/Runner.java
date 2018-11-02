@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import neat.ConnectionGene;
 import neat.Counter;
 import neat.Evaluator;
+import neat.NeuralNetwork;
 import neat.Organism;
 import neat.NodeGene;
 import org.json.*;
@@ -38,6 +39,8 @@ public class Runner implements XmlConversionMethods
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
         
+        
+        //THE BASE ORGANISM THAT ALL WILL EVOLVE FROM. AKA THE RIGHT INPUTS(OBSERVATIONS) AND OUTPUTS(MOVES)
         //make a new organism
         Organism organism = new Organism();
         
@@ -85,13 +88,13 @@ public class Runner implements XmlConversionMethods
         
         
         
-        //create connectionGenes
+        //create the base connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
         organism.addConnectionGene(new ConnectionGene(n1,n8,0.5f,true,c1));
         
         
-         //create evaluator and pass in the popSize, the starting organism, and the counters for the two types of connections
+         //create evaluator and pass in the starting organism, and the counters for the two types of connections
         Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
             
@@ -99,8 +102,8 @@ public class Runner implements XmlConversionMethods
             protected float evaluateGenome(Organism organism){
  
                 try {
-                    //RUN THE ORGANISM HERE 
-                    //aka neural net evaluation
+                    
+                    //run the organism that is passed in and return a fitness score
                     return runOrganism(organism);
                     
                     
@@ -134,7 +137,17 @@ public class Runner implements XmlConversionMethods
     
     static private float runOrganism(Organism organism) throws Exception{
         
-         ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
+        //create the neural network that will run by passing in the organism 
+        NeuralNetwork network = new NeuralNetwork(organism);
+        //observation values will be passed into here
+        float input[];
+        //output values will be passed into here
+        float output[]; 
+        
+        
+        
+        
+        ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
         AgentHost agent_host = new AgentHost();
         
@@ -142,10 +155,10 @@ public class Runner implements XmlConversionMethods
         MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
-        my_mission_record.recordCommands();
-        my_mission_record.recordMP4(20, 400000);
-        my_mission_record.recordRewards();
-        my_mission_record.recordObservations();
+        //my_mission_record.recordCommands();
+        //my_mission_record.recordMP4(20, 400000);
+        //my_mission_record.recordRewards();
+        //my_mission_record.recordObservations();
         
 
         try {

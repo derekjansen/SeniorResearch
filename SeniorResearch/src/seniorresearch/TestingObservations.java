@@ -55,27 +55,27 @@ public class TestingObservations implements XmlConversionMethods
         String missionXmlString = createMissionString(1);
         MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
-       // MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
-       // my_mission_record.recordCommands();
-       // my_mission_record.recordMP4(20, 400000);
-       // my_mission_record.recordRewards();
-       // my_mission_record.recordObservations();
+        MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
+        //my_mission_record.recordCommands();
+        //my_mission_record.recordMP4(20, 400000);
+        //my_mission_record.recordRewards();
+        //my_mission_record.recordObservations();
         
 
-//        try {
-//            agent_host.startMission( my_mission, my_mission_record);
-//        }
-//        catch (MissionException e) {
-//            System.err.println( "Error starting mission: " + e.getMessage() );
-//            System.err.println( "Error code: " + e.getMissionErrorCode() );
-//            // We can use the code to do specific error handling, eg:
-//            if (e.getMissionErrorCode() == MissionException.MissionErrorCode.MISSION_INSUFFICIENT_CLIENTS_AVAILABLE)
-//            {
-//                // Caused by lack of available Minecraft clients.
-//                System.err.println( "Is there a Minecraft client running?");
-//            }
-//            System.exit(1);
-//        }
+        try {
+            agent_host.startMission( my_mission, my_mission_record);
+        }
+        catch (MissionException e) {
+            System.err.println( "Error starting mission: " + e.getMessage() );
+            System.err.println( "Error code: " + e.getMissionErrorCode() );
+            // We can use the code to do specific error handling, eg:
+            if (e.getMissionErrorCode() == MissionException.MissionErrorCode.MISSION_INSUFFICIENT_CLIENTS_AVAILABLE)
+            {
+                // Caused by lack of available Minecraft clients.
+                System.err.println( "Is there a Minecraft client running?");
+            }
+            System.exit(1);
+        }
 
         WorldState world_state;
 
