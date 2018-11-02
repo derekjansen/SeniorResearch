@@ -52,7 +52,7 @@ public class ButtonMashing implements XmlConversionMethods
         AgentHost agent_host = new AgentHost();
 
         
-        String missionXmlString = createMissionString();
+        String missionXmlString = createMissionString(0);
         MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");

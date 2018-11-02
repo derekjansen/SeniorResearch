@@ -20,9 +20,23 @@ import org.w3c.dom.Document;
  * @author derekgrove
  */
 public interface XmlConversionMethods {
+    
+    String test = "/Users/derekgrove/NetBeansProjects/SeniorResearch/SeniorResearch/src/seniorresearch/TestingXml.xml";
+    String main = "/Users/derekgrove/NetBeansProjects/SeniorResearch/SeniorResearch/src/seniorresearch/MainMission.xml";
+    
 
-    public static String createMissionString() {
-        final String xmlFilePath = "/Users/derekgrove/NetBeansProjects/SeniorResearch/SeniorResearch/src/seniorresearch/MainMission.xml";
+    public static String createMissionString(int pick) {
+        final String xmlFilePath; 
+        if(pick == 0){
+            xmlFilePath = main;
+        }else{
+            xmlFilePath = test;
+
+        }
+        
+        
+        
+        
         Document xmlDoc = convertXMLFileToXMLDocument(xmlFilePath);
 
         TransformerFactory tf = TransformerFactory.newInstance();

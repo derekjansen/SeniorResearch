@@ -8,7 +8,7 @@ import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
 
 
-public class RuledBased implements XmlConversionMethods
+public class TestingObservations implements XmlConversionMethods
 {
     static Map<Integer,String> outputButtonNames;
     static double highestScore = 0;
@@ -52,30 +52,30 @@ public class RuledBased implements XmlConversionMethods
         AgentHost agent_host = new AgentHost();
 
         
-        String missionXmlString = createMissionString(0);
+        String missionXmlString = createMissionString(1);
         MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
-        MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
-        my_mission_record.recordCommands();
-        my_mission_record.recordMP4(20, 400000);
-        my_mission_record.recordRewards();
-        my_mission_record.recordObservations();
+       // MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
+       // my_mission_record.recordCommands();
+       // my_mission_record.recordMP4(20, 400000);
+       // my_mission_record.recordRewards();
+       // my_mission_record.recordObservations();
         
 
-        try {
-            agent_host.startMission( my_mission, my_mission_record);
-        }
-        catch (MissionException e) {
-            System.err.println( "Error starting mission: " + e.getMessage() );
-            System.err.println( "Error code: " + e.getMissionErrorCode() );
-            // We can use the code to do specific error handling, eg:
-            if (e.getMissionErrorCode() == MissionException.MissionErrorCode.MISSION_INSUFFICIENT_CLIENTS_AVAILABLE)
-            {
-                // Caused by lack of available Minecraft clients.
-                System.err.println( "Is there a Minecraft client running?");
-            }
-            System.exit(1);
-        }
+//        try {
+//            agent_host.startMission( my_mission, my_mission_record);
+//        }
+//        catch (MissionException e) {
+//            System.err.println( "Error starting mission: " + e.getMessage() );
+//            System.err.println( "Error code: " + e.getMissionErrorCode() );
+//            // We can use the code to do specific error handling, eg:
+//            if (e.getMissionErrorCode() == MissionException.MissionErrorCode.MISSION_INSUFFICIENT_CLIENTS_AVAILABLE)
+//            {
+//                // Caused by lack of available Minecraft clients.
+//                System.err.println( "Is there a Minecraft client running?");
+//            }
+//            System.exit(1);
+//        }
 
         WorldState world_state;
 
@@ -102,32 +102,21 @@ public class RuledBased implements XmlConversionMethods
             int damageTaken = 0;
             int damageDealt = 0;
             int timeAlive = 0;
-            Double zombieXPos = null;
-            Double zombieZPos = null;
+            
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         
-        //pause on daylight for a bit
-        try {
-                Thread.sleep(20000);
-            } catch(InterruptedException ex) {
-                System.err.println( "User interrupted while mission was running." );
-                return 0;
-            }
-        agent_host.sendCommand("chat /tp 4 228 4");
-        //turn to night
-        agent_host.sendCommand("chat /time set 15000");
+
         //Spawn zombie in the corner
-        agent_host.sendCommand("chat /summon zombie 11 228 11");
+        agent_host.sendCommand("chat /summon zombie 1 228 1");
         
         
         do {
-                zombieXPos = null;
-                zombieZPos = null;        
+            
             
              //////////GET OBSERVATIONS/////////////
             
             if(world_state.getObservations().size() > 0){
-            //    System.out.println(world_state.getObservations().get(0).getText());
+                System.out.println(world_state.getObservations().get(0).getText());
                
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
                // life = root.getDouble("Life");
@@ -150,8 +139,7 @@ public class RuledBased implements XmlConversionMethods
                         if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
                             //the entity is the zombie here.
                             System.out.println("Found the zombie");
-                            zombieXPos = theEntity.getDouble("x");
-                            zombieZPos = theEntity.getDouble("z");
+                          //  System.out.println(theEntity);
                             System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
                             System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
@@ -159,58 +147,21 @@ public class RuledBased implements XmlConversionMethods
                         i--;
                     }
                 }
-               //have player stats and zombie position here
-               System.out.println("PLAYER STATS:    timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+                
+                System.out.println("PLAYER STATS:    timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                 
             }
             
-            //stop
+            
+            
+            
+            ////////////randomized outputs to mimic button mashing///////////////
             agent_host.sendCommand( "turn 0");
             agent_host.sendCommand( "move 0" );
-            int sleeptime = 0;
-            //do things with some basic logic
-            
-            //saw zombie and know where it is
-            if(zombieXPos != null && zombieZPos != null){
-                double tempX = zombieXPos - xPos;
-                double tempZ = zombieZPos - zPos;
-                
-                if(tempX > 0 || tempZ > 0){
-                    agent_host.sendCommand("attack 1");
-                    agent_host.sendCommand("turn 1");
-                    System.out.println("Saw zombie: turn 1");
-                }else if (tempX < 0 || tempZ < 0){
-                    agent_host.sendCommand("attack 1");
-                    agent_host.sendCommand("turn -1");
-                     System.out.println("Saw zombie: turn -1");
-                }else{
-                    agent_host.sendCommand("attack 1");
-                }
-                  sleeptime = 25;  
-                
-            }else{  //no zombie in sight just move around
-                Random r = new Random();
-                int toDo = r.nextInt() % 5;
-                
-                if(toDo > 2){
-                    agent_host.sendCommand("move 1");
-                    sleeptime = 500;
-                }
-                else if(toDo == 1){
-                    agent_host.sendCommand("turn 1");
-                    sleeptime = 200;
-                }else{  //is 0
-                    agent_host.sendCommand("turn -1");
-                    sleeptime = 200;
-                }
-            }
-            
-            
-            
-            
+          
             
             try {
-                Thread.sleep(sleeptime);
+                Thread.sleep(1000);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
                 return 0;
@@ -222,7 +173,8 @@ public class RuledBased implements XmlConversionMethods
                 System.err.println( "Error: " + error.getText() );
             }
               
-          
+       
+        
         } while(world_state.getIsMissionRunning() );
 
         
@@ -231,13 +183,13 @@ public class RuledBased implements XmlConversionMethods
         
         //FIX THESE CUZ THEY WACK
         
+        timeAlive = timeAlive - oldTimeAlive;
+        oldTimeAlive = oldTimeAlive + timeAlive;
         
         //get correct run scores since the stats for the organism persists between runs
-         timeAlive = timeAlive - oldTimeAlive;
-         if(oldTimeAlive != 0){
-            oldTimeAlive = oldTimeAlive + timeAlive; 
-         }
-         
+        timeAlive = timeAlive - oldTimeAlive;
+        oldTimeAlive = oldTimeAlive + timeAlive;
+        
         damageDealt = damageDealt - oldDamageDealt;
         oldDamageDealt = oldDamageDealt + damageDealt;
         
