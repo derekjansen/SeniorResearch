@@ -45,7 +45,7 @@ public class TestPlusNeural {
         Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
             
-            protected float evaluateGenome(Organism organism){
+            protected float evaluateOrganism(Organism organism){
                 
               float[] input = {1.2f,1.2f};
               NeuralNetwork net = new NeuralNetwork(organism);

@@ -17,8 +17,8 @@ import static seniorresearch.XmlConversionMethods.createMissionString;
 
 public class Runner implements XmlConversionMethods
 {
+    //hold node number and input/output actions
     static Map<Integer,String> outputButtonNames;
-    static Map<Integer,String> inputButtonNames;
     
     static
     {        
@@ -30,8 +30,7 @@ public class Runner implements XmlConversionMethods
         
         //////////////////SET UP NEAT CODE/////////////////////
         
-        //associate nodes with input/output
-        inputButtonNames = new HashMap();
+        //associate nodes with output
         outputButtonNames = new HashMap();
         
         
@@ -60,19 +59,13 @@ public class Runner implements XmlConversionMethods
         
         //number of input node is associated with the type of input
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
-        inputButtonNames.put(n1, "Life");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n2));
-        inputButtonNames.put(n2, "XPos");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n3));
-        inputButtonNames.put(n3, "ZPos");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
-        inputButtonNames.put(n4, "MobsKilled");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
-        inputButtonNames.put(n5, "DamageTaken");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
-        inputButtonNames.put(n6, "DamageDealt");
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n7));
-        inputButtonNames.put(n7, "TimeAlive");
+
                 
         //number of output node is associated with the "buttons" that can be pressed
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n8));
@@ -99,7 +92,7 @@ public class Runner implements XmlConversionMethods
             @Override
             
             //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
-            protected float evaluateGenome(Organism organism){
+            protected float evaluateOrganism(Organism organism){
  
                 try {
                     
@@ -144,7 +137,15 @@ public class Runner implements XmlConversionMethods
         //output values will be passed into here
         float output[]; 
         
-        
+        float life = 0;
+        float xPos = 0;
+        float zPos = 0;
+        float mobKilled = 0;
+        float damageTaken = 0;
+        float damageDealt = 0;
+        float timeAlive = 0;
+        float zombieXPos = 0;
+        float zombieZPos = 0;
         
         
         ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
@@ -201,17 +202,8 @@ public class Runner implements XmlConversionMethods
         agent_host.sendCommand("chat /summon zombie -11 228 -11");
             
     do {
-           
-            
+
              //////////GET OBSERVATIONS/////////////
-            
-            double life;
-            double xPos;
-            double zPos;
-            int mobKilled;
-            int damageTaken;
-            int damageDealt;
-            int timeAlive;
             
             if(world_state.getObservations().size() > 0){
                 System.out.println(world_state.getObservations().get(0).getText());
@@ -238,6 +230,8 @@ public class Runner implements XmlConversionMethods
                             //the entity is the zombie here.
                             System.out.println("we found the zombie");
                             System.out.println(theEntity);
+                            zombieXPos = (float)theEntity.getDouble("x");
+                            zombieZPos = (float)theEntity.getDouble("z");
                             System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
                             System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
@@ -247,19 +241,22 @@ public class Runner implements XmlConversionMethods
                 }
                 
                 System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
-                
+               
             }
             
             
+            ///////////////// plug in observations and send to neural net////////////////
             
-            ////////////randomized outputs for right now///////////////
-            agent_host.sendCommand( "turn 0");
-            agent_host.sendCommand( "move 0" );
-            Random r = new Random();
-            int x = Math.abs(r.nextInt() % 5) + 7;
-            System.out.println(x);
-            System.out.println(outputButtonNames.get(x));
-            agent_host.sendCommand(outputButtonNames.get(x));
+            
+            
+            input = new float[]{xPos,zPos, zombieXPos, zombieZPos, damageTaken, damageDealt};           
+            output = network.calculate(input);
+            
+
+            
+            /////////////////////Take output and select the action//////////////////////
+            
+            
             
             try {
                 Thread.sleep(1000);
@@ -268,8 +265,6 @@ public class Runner implements XmlConversionMethods
                 return 0;
             }
 
-            
-            
             world_state = agent_host.getWorldState();
 
             for( int i = 0; i < world_state.getErrors().size(); i++ ) {
@@ -282,8 +277,9 @@ public class Runner implements XmlConversionMethods
 
         System.out.println( "Mission has stopped." );
         
-        //calculate score here
-        return 0f;
+        //////////////////////////calculate score ///////////////////////////////
+        
+        return (float) ((1.0 * timeAlive) + (20.0 * damageDealt) + (50.0 * mobKilled) - (100.00 * damageTaken));
         
     }
        

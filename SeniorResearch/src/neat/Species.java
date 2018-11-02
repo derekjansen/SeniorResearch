@@ -11,14 +11,14 @@ public class Species {
 		
 		public Organism mascot;
 		public List<Organism> members;
-		public List<Evaluator.FitnessGenome> fitnessPop;
+		public List<Evaluator.FitnessOrganism> fitnessPop;
 		public float totalAdjustedFitness = 0f;
 		
 		public Species(Organism mascot) {
 			this.mascot = mascot;
 			this.members = new LinkedList<Organism>(); 
 			this.members.add(mascot);
-			this.fitnessPop = new ArrayList<Evaluator.FitnessGenome>(); 
+			this.fitnessPop = new ArrayList<Evaluator.FitnessOrganism>(); 
 		}
 		
 		public void addAdjustedFitness(float adjustedFitness) {

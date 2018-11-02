@@ -49,7 +49,7 @@ public class Test {
         Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
             
-            protected float evaluateGenome(Organism organism){
+            protected float evaluateOrganism(Organism organism){
                 
                                 
                 

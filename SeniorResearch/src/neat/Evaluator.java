@@ -1,17 +1,18 @@
 package neat;
-
+//
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 public abstract class Evaluator implements Tuning{
 	
-	private FitnessGenomeComparator fitComp = new FitnessGenomeComparator();
+	private FitnessOrganismComparator fitComp = new FitnessOrganismComparator();
 	
 	private Counter nodeInnovation;
 	private Counter connectionInnovation;
@@ -20,6 +21,7 @@ public abstract class Evaluator implements Tuning{
 	
 	
 	private List<Organism> organisms;
+	private List<FitnessOrganism> fitnessOrganisms;
 	private List<Organism> nextGenOrganisms;
 	
 	private List<Species> species;
@@ -27,18 +29,17 @@ public abstract class Evaluator implements Tuning{
 	private Map<Organism, Species> mappedSpecies;
 	private Map<Organism, Float> scoreMap;
 	private float highestScore;
+	private int stagnation = 0;
 	private Organism mostFitOrganism;
 	
-	public Evaluator(Organism startingGenome, Counter nodeInnovation, Counter connectionInnovation) {
+	public Evaluator(Organism startingOrganism, Counter nodeInnovation, Counter connectionInnovation) {
 		this.nodeInnovation = nodeInnovation;
 		this.connectionInnovation = connectionInnovation;
+		
 		organisms = new ArrayList<Organism>(populationSize);
 		for (int i = 0; i < populationSize; i++) {
-			organisms.add(new Organism(startingGenome));
+			organisms.add(new Organism(startingOrganism));
 		}
-		nextGenOrganisms = new ArrayList<Organism>(populationSize);
-		mappedSpecies = new HashMap<Organism, Species>();
-		scoreMap = new HashMap<Organism, Float>();
 		species = new ArrayList<Species>();
 	}
 	
@@ -46,17 +47,19 @@ public abstract class Evaluator implements Tuning{
 	 * Runs one generation
 	 */
 	public void evaluate() {
+		stagnation++;
+		
 		// Reset everything for next generation
 		for (Species s : species) {
 			s.reset(random);
 		}
-		scoreMap.clear();
-		mappedSpecies.clear();
-		nextGenOrganisms.clear();
-		highestScore = Float.MIN_VALUE;
-		mostFitOrganism = null;
+		scoreMap = new HashMap<Organism, Float>();
+		mappedSpecies = new HashMap<Organism, Species>();
+		nextGenOrganisms = new LinkedList<Organism>();
+		fitnessOrganisms = new LinkedList<FitnessOrganism>();
 		
 		// Place organisms into species
+		int added = 0;
 		for (Organism g : organisms) {
 			boolean foundSpecies = false;
 			for (Species s : species) {
@@ -71,64 +74,103 @@ public abstract class Evaluator implements Tuning{
 				Species newSpecies = new Species(g);
 				species.add(newSpecies);
 				mappedSpecies.put(g, newSpecies);
+				added++;
 			}
 		}
+		//System.out.println("Added "+added+" species");
 		
 		// Remove unused species
 		removeEmptySpecies();
-	
-// Evaluate organisms and assign score --- CALLS the evaulate Genome method.
+		
+		// Evaluate organisms and assign score
 		for (Organism g : organisms) {
 			Species s = mappedSpecies.get(g);		// Get species of the organism
 			
-			float score = evaluateGenome(g);
-                        //adjust based on size of the species
+			float score = evaluateOrganism(g);
 			float adjustedScore = score / mappedSpecies.get(g).members.size();
 			
+			FitnessOrganism fitOrganism = new FitnessOrganism(g, adjustedScore);
+			
 			s.addAdjustedFitness(adjustedScore);	
-			s.fitnessPop.add(new FitnessGenome(g, adjustedScore));
+			s.fitnessPop.add(fitOrganism);
+			
+			fitnessOrganisms.add(fitOrganism);
+			
 			scoreMap.put(g, adjustedScore);
 			if (score > highestScore) {
+				stagnation = 0;
 				highestScore = score;
 				mostFitOrganism = g;
 			}
 		}
 		
-                
 		// put best organisms from each species into next generation
+		nextGenOrganisms.add(mostFitOrganism);
 		for (Species s : species) {
-			Collections.sort(s.fitnessPop, fitComp);
-			Collections.reverse(s.fitnessPop);
-			FitnessGenome mostFitInSpecies = s.fitnessPop.get(0);
-			nextGenOrganisms.add(mostFitInSpecies.organism);
+			if (s.members.size() > 5) {
+				Collections.sort(s.fitnessPop, fitComp);
+				Collections.reverse(s.fitnessPop);
+				FitnessOrganism fittestInSpecies = s.fitnessPop.get(0);
+				//System.out.println("Adding organism with fitness: "+fittestInSpecies.fitness);
+				nextGenOrganisms.add(fittestInSpecies.organism);
+			}
 		}
 		
-                
+		if (stagnation > 40) {
+			System.out.println("CLEANING UPUUUP!");
+			Collections.sort(fitnessOrganisms, fitComp);
+			Collections.reverse(fitnessOrganisms);
+			for (int i = 5; i < fitnessOrganisms.size(); i++) {
+				FitnessOrganism fg = fitnessOrganisms.get(i);
+				organisms.remove(fg.organism);
+				for (Species s : species) {
+					s.members.remove(fg.organism);
+					s.fitnessPop.remove(fg);
+					mappedSpecies.remove(fg.organism);
+					scoreMap.remove(fg.organism);
+				}
+			}
+			removeEmptySpecies();
+			stagnation = 0;
+		}
+		
 		// Breed the rest of the organisms
 		while (nextGenOrganisms.size() < populationSize) { // replace removed organisms by randomly breeding
 			Species s = getRandomSpeciesBiasedAjdustedFitness(random);
 			
-			Organism p1 = getRandomGenomeBiasedAdjustedFitness(s, random);
-			Organism p2 = getRandomGenomeBiasedAdjustedFitness(s, random);
+			Organism p1 = getRandomOrganismBiasedAdjustedFitness(s, random);
+			Organism p2 = getRandomOrganismBiasedAdjustedFitness(s, random);
 			
-			Organism child;
-			if (scoreMap.get(p1) >= scoreMap.get(p2)) {
-				child = Organism.crossover(p1, p2, random);
+			if (random.nextFloat() < 0.2f) {
+				if (scoreMap.get(p1) >= scoreMap.get(p2)) {
+					Organism mutated = new Organism(p1);
+					mutated.mutation(random);
+					nextGenOrganisms.add(mutated);
+				} else {
+					Organism mutated = new Organism(p2);
+					mutated.mutation(random);
+					nextGenOrganisms.add(mutated);
+				}
 			} else {
-				child = Organism.crossover(p2, p1, random);
+				Organism child;
+				if (scoreMap.get(p1) >= scoreMap.get(p2)) {
+					child = Organism.crossover(p1, p2, random);
+				} else {
+					child = Organism.crossover(p2, p1, random);
+				}
+				if (random.nextFloat() < MUTATION_RATE) {
+					child.mutation(random);
+				}
+				if (random.nextFloat() < ADD_CONNECTION_RATE) {
+					//System.out.println("Adding connection mutation...");
+					child.addConnectionMutation(random, connectionInnovation, 10);
+				}
+				if (random.nextFloat() < ADD_NODE_RATE) {
+					//System.out.println("Adding node mutation...");
+					child.addNodeMutation(random, connectionInnovation, nodeInnovation);
+				}
+				nextGenOrganisms.add(child);
 			}
-			if (random.nextFloat() < MUTATION_RATE) {
-				child.mutation(random);
-			}
-			if (random.nextFloat() < ADD_CONNECTION_RATE) {
-				//System.out.println("Adding connection mutation...");
-				child.addConnectionMutation(random, connectionInnovation, 10);
-			}
-			if (random.nextFloat() < ADD_NODE_RATE) {
-				//System.out.println("Adding node mutation...");
-				child.addNodeMutation(random, connectionInnovation, nodeInnovation);
-			}
-			nextGenOrganisms.add(child);
 		}
 		
 		organisms = nextGenOrganisms;
@@ -170,14 +212,14 @@ public abstract class Evaluator implements Tuning{
 	/**
 	 * Selects a random organism from the species chosen, where organisms with a higher adjusted fitness have a higher chance of being selected
 	 */
-	private Organism getRandomGenomeBiasedAdjustedFitness(Species selectFrom, Random random) {
+	private Organism getRandomOrganismBiasedAdjustedFitness(Species selectFrom, Random random) {
 		double completeWeight = 0.0;	// sum of probablities of selecting each organism - selection is more probable for organisms with higher fitness
-		for (FitnessGenome fg : selectFrom.fitnessPop) {
+		for (FitnessOrganism fg : selectFrom.fitnessPop) {
 			completeWeight += fg.fitness;
 		}
         double r = Math.random() * completeWeight;
         double countWeight = 0.0;
-        for (FitnessGenome fg : selectFrom.fitnessPop) {
+        for (FitnessOrganism fg : selectFrom.fitnessPop) {
             countWeight += fg.fitness;
             if (countWeight >= r) {
             	 return fg.organism;
@@ -194,22 +236,22 @@ public abstract class Evaluator implements Tuning{
 		return highestScore;
 	}
 	
-	public Organism getFittestGenome() {
+	public Organism getFittestOrganism() {
 		return mostFitOrganism;
 	}
 	
-        public List<Organism> getGenomeList(){
+        public List<Organism> getOrganismList(){
             return organisms;
         }
         
-	protected abstract float evaluateGenome(Organism organism);
+	protected abstract float evaluateOrganism(Organism organism);
 	
-	public class FitnessGenome {
+	public class FitnessOrganism {
 		
 		float fitness;
 		Organism organism;
 		
-		public FitnessGenome(Organism organism, float fitness) {
+		public FitnessOrganism(Organism organism, float fitness) {
 			this.organism = organism;
 			this.fitness = fitness;
 		}
@@ -217,10 +259,10 @@ public abstract class Evaluator implements Tuning{
 	
 	
 	
-	public class FitnessGenomeComparator implements Comparator<FitnessGenome> {
+	public class FitnessOrganismComparator implements Comparator<FitnessOrganism> {
 
 		@Override
-		public int compare(FitnessGenome one, FitnessGenome two) {
+		public int compare(FitnessOrganism one, FitnessOrganism two) {
 			if (one.fitness > two.fitness) {
 				return 1;
 			} else if (one.fitness < two.fitness) {
