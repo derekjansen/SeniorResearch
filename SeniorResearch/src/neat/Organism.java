@@ -157,7 +157,7 @@ public class Organism implements Utils{
 			success = true;
 		}
 		if (success == false) {
-			System.out.println("Tried, but could not add more connections");
+			//System.out.println("Tried, but could not add more connections");
 		}
 	}
 	

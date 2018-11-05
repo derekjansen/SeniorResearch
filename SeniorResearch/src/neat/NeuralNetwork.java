@@ -226,6 +226,8 @@ public class NeuralNetwork {
 			output = 0f;
 		}
 		
+                
+                //modified sigmoidal transfer function
 		/* Takes any float, and returns a value between 0 and 1. 0f returns 0.5f */
 		private float sigmoidActivationFunction(float in) {
 			return (float)(1f/( 1f + Math.exp(-4.9d*in)));

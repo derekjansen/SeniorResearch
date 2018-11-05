@@ -17,6 +17,11 @@ import static seniorresearch.XmlConversionMethods.createMissionString;
 
 public class Runner implements XmlConversionMethods
 {
+    static float timeReward = 1.0f;
+    static float damageDealtReward = 20.0f;
+    static float damageRecievedReward = 100.0f;
+    static float zombiesKilledReward = 50.0f;
+    
     //hold node number and input/output actions
     static Map<Integer,String> outputButtonNames;
     
@@ -27,8 +32,7 @@ public class Runner implements XmlConversionMethods
     
     public static void main(String argv[]) throws Exception
     {
-        
-        //////////////////SET UP NEAT CODE/////////////////////
+///////////////////////////SET UP NEAT CODE/////////////////////
         
         //associate nodes with output
         outputButtonNames = new HashMap();
@@ -57,7 +61,7 @@ public class Runner implements XmlConversionMethods
         int n11 = nodeInnovation.getInnovation();
         int n12 = nodeInnovation.getInnovation();
         
-        //number of input node is associated with the type of input
+        //number of input node is associated with the type of input       
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n2));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n3));
@@ -94,12 +98,15 @@ public class Runner implements XmlConversionMethods
             //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
             protected float evaluateOrganism(Organism organism){
  
-                try {
+                try{
                     
                     //run the organism that is passed in and return a fitness score
-                    return runOrganism(organism);
+                    float score = runOrganism(organism);
                     
+                    System.out.println("The organism's score is: " + score);
                     
+                    return score;
+                       
                 } catch (Exception ex) {
                     Logger.getLogger(Runner.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -132,11 +139,13 @@ public class Runner implements XmlConversionMethods
         
         //create the neural network that will run by passing in the organism 
         NeuralNetwork network = new NeuralNetwork(organism);
+        
         //observation values will be passed into here
         float input[];
         //output values will be passed into here
         float output[]; 
         
+        //other needed variables 
         float life = 0;
         float xPos = 0;
         float zPos = 0;
@@ -148,7 +157,7 @@ public class Runner implements XmlConversionMethods
         float zombieZPos = 0;
         
         
-        ///////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
+/////////////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
         AgentHost agent_host = new AgentHost();
         
@@ -196,14 +205,31 @@ public class Runner implements XmlConversionMethods
 
        
         
-        //////////////////////////// MAIN LOOP ////////////////////////////////////////////////////////// 
-
+///////////////////////////////////// MAIN LOOP ////////////////////////////////////////////////////////// 
+        
+        float oldMobKilled = 0;
+        float oldDamageTaken = 0;
+        float oldDamageDealt = 0;
+        float oldTimeAlive = 0;
+        
+        
+        
+        //pause on daylight for a bit
+        try {
+                Thread.sleep(20000);
+            } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return 0;
+            }
+        agent_host.sendCommand("chat /tp 4 228 4");
+        //turn to night
+        agent_host.sendCommand("chat /time set 15000");
         //Spawn zombie in the corner
-        agent_host.sendCommand("chat /summon zombie -11 228 -11");
-            
+        agent_host.sendCommand("chat /summon zombie 11 228 11");
+        
     do {
 
-             //////////GET OBSERVATIONS/////////////
+///////////////////////////GET OBSERVATIONS/////////////////////////////////
             
             if(world_state.getObservations().size() > 0){
                 System.out.println(world_state.getObservations().get(0).getText());
@@ -228,7 +254,7 @@ public class Runner implements XmlConversionMethods
            
                         if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
                             //the entity is the zombie here.
-                            System.out.println("we found the zombie");
+                            System.out.println("zombie found");
                             System.out.println(theEntity);
                             zombieXPos = (float)theEntity.getDouble("x");
                             zombieZPos = (float)theEntity.getDouble("z");
@@ -238,25 +264,40 @@ public class Runner implements XmlConversionMethods
                         }
                         i--;
                     }
-                }
-                
-                System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+                } 
+                //System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                
             }
             
             
-            ///////////////// plug in observations and send to neural net////////////////
             
             
             
-            input = new float[]{xPos,zPos, zombieXPos, zombieZPos, damageTaken, damageDealt};           
+///////////////////////////plug in observations and send to neural net////////////////
+            
+            System.out.println("Input array looks like: ["+xPos+", "+zPos+", "+zombieXPos+", "+zombieZPos+", "+damageTaken+", "+damageDealt+", "+timeAlive+"]");
+
+
+            input = new float[]{xPos, zPos, zombieXPos, zombieZPos, damageTaken, damageDealt, timeAlive};           
             output = network.calculate(input);
+           
+            
+            
             
 
+///////////////////////////Take output and select the action//////////////////////
+            int selection = 0;
+            float score = 0f;
+            for(int i = 0; i < output.length; i++){
+                System.out.println("Output " + i + " = " + output[i]);
+                if(output[i] > score){
+                    score = output[i];
+                    selection = i;
+                }   
+            }
             
-            /////////////////////Take output and select the action//////////////////////
             
-            
+            //System.out.println("The output node with the greatest value is: " + selection + " with a value of: " + output[selection]);
             
             try {
                 Thread.sleep(1000);
@@ -277,10 +318,29 @@ public class Runner implements XmlConversionMethods
 
         System.out.println( "Mission has stopped." );
         
-        //////////////////////////calculate score ///////////////////////////////
         
-        return (float) ((1.0 * timeAlive) + (20.0 * damageDealt) + (50.0 * mobKilled) - (100.00 * damageTaken));
         
+        
+////////////////////////////////calculate  and return score ///////////////////////////////
+        timeAlive = timeAlive - oldTimeAlive;
+         if(oldTimeAlive != 0){
+            oldTimeAlive = oldTimeAlive + timeAlive; 
+         }
+         
+        damageDealt = damageDealt - oldDamageDealt;
+        oldDamageDealt = oldDamageDealt + damageDealt;
+        
+        damageTaken = damageTaken - oldDamageTaken;
+        oldDamageTaken = oldDamageTaken +damageTaken;
+        
+        mobKilled = mobKilled - oldMobKilled;
+        oldMobKilled = oldMobKilled + mobKilled;
+        
+        
+        
+        
+        
+        return ((timeReward * timeAlive) + (damageDealtReward * damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * damageTaken));
     }
        
 }
