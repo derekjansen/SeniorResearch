@@ -71,8 +71,11 @@ public class TestWithCorrectNodes {
                 
               float[] input = {3.0f, 0.0f, 1.0f, 1.5f, 0.0f, 100.0f, 12.0f};
               NeuralNetwork net = new NeuralNetwork(organism);
-              float output[]= net.calculate(input);
-              System.out.println("\tOutput node 1= " + output[0] + "\n\tOutput node 2= " + output[1] + "\n\tOutput node 3= " + output[2]+ "\n\tOutput node 4= " + output[3]+ "\n\tOutput node 5= " + output[4]);
+                System.out.println("\nNew Organism");
+              for(int i = 3; i > 0; i-- ){
+                float output[]= net.calculate(input);
+                System.out.println("\tOutput node 1= " + output[0] + "\n\tOutput node 2= " + output[1] + "\n\tOutput node 3= " + output[2]+ "\n\tOutput node 4= " + output[3]+ "\n\tOutput node 5= " + output[4]);
+              }
               
               return organism.getConnectionGenes().values().size();
                 
