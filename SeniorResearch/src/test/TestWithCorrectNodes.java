@@ -41,7 +41,7 @@ public class TestWithCorrectNodes {
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n7));
+        
 
                 
         //number of output node is associated with the "buttons" that can be pressed
@@ -69,7 +69,7 @@ public class TestWithCorrectNodes {
             
             protected float evaluateOrganism(Organism organism){
                 
-              float[] input = {3.0f, 0.0f, 1.0f, 1.5f, 0.0f, 100.0f, 12.0f};
+              float[] input = {5.0f, 5.0f, -1.0f, -1.0f, 1000.0f, 0.0f};
               NeuralNetwork net = new NeuralNetwork(organism);
                 System.out.println("\nNew Organism");
               for(int i = 3; i > 0; i-- ){
@@ -90,6 +90,12 @@ public class TestWithCorrectNodes {
             System.out.print("Generation: " + i);
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
+            if (i==0) {
+                    //LegacyOrganismPrinter.printOrganism(eval.getMostFitOrganism(), "/"+i+".png");
+                    OrganismPrinter printer = new OrganismPrinter();
+                    printer.showOrganism(eval.getMostFitOrganism(), "");
+            }
+            
         } 
     }
 }

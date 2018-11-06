@@ -241,7 +241,7 @@ public abstract class Evaluator implements Tuning{
 		return highestScore;
 	}
 	
-	public Organism getFittestOrganism() {
+	public Organism getMostFitOrganism() {
 		return mostFitOrganism;
 	}
 	

@@ -68,7 +68,7 @@ public class Runner implements XmlConversionMethods
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n7));
+        
 
                 
         //number of output node is associated with the "buttons" that can be pressed
@@ -157,8 +157,8 @@ public class Runner implements XmlConversionMethods
         float damageTaken = 0;
         float damageDealt = 0;
         float timeAlive = 0;
-        float zombieXPos = 0;
-        float zombieZPos = 0;
+        float zombieXPos = -1;
+        float zombieZPos = -1;
         
         
 /////////////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
@@ -270,14 +270,16 @@ public class Runner implements XmlConversionMethods
                         //    System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
                         //    System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
-                        }
+                        }else{
+                            zombieXPos = -1;
+                            zombieZPos = -1;
+                         }
+                        
                         i--;
                     }
+                    
                 }
-                else{
-                    zombieXPos = 0;
-                    zombieZPos = 0;
-                }
+                
                // System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                
             }
@@ -288,10 +290,10 @@ public class Runner implements XmlConversionMethods
             
 ///////////////////////////plug in observations and send to neural net////////////////
             
-            System.out.println("Input array looks like: ["+xPos+", "+zPos+", "+zombieXPos+", "+zombieZPos+", "+damageTaken+", "+damageDealt+", "+timeAlive+"]");
+            System.out.println("Input array looks like: ["+xPos+", "+zPos+", "+zombieXPos+", "+zombieZPos+", "+damageTaken+", "+damageDealt+"]");
 
 
-           input = new float[]{xPos, zPos, zombieXPos, zombieZPos, damageTaken, damageDealt, timeAlive};           
+           input = new float[]{xPos, zPos, zombieXPos, zombieZPos, damageTaken, damageDealt};           
            
            output = network.calculate(input);
            
@@ -302,11 +304,14 @@ public class Runner implements XmlConversionMethods
 ///////////////////////////Take output and select the action//////////////////////
             int selection = 0;
             float score = 0f;
-            for(int i = 0; i < output.length; i++){
+            for(int i = 0; i < 5; i++){
                 System.out.println("Output " + i + " = " + output[i]);
                 if(output[i] > score){
+                    
                     score = output[i];
+                    System.out.println("Score = " + score);
                     selection = i;
+                    System.out.println("Selection = " + selection);
                 }   
             }
             selection += 7;
