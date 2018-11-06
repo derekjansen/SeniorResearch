@@ -17,9 +17,9 @@ import static seniorresearch.XmlConversionMethods.createMissionString;
 
 public class Runner implements XmlConversionMethods
 {
-    static float timeReward = 1.0f;
+    static float timeReward = 15.0f;
     static float damageDealtReward = 20.0f;
-    static float damageRecievedReward = 100.0f;
+    static float damageRecievedReward = 50.0f;
     static float zombiesKilledReward = 50.0f;
     
     //hold node number and input/output actions
@@ -99,11 +99,15 @@ public class Runner implements XmlConversionMethods
             protected float evaluateOrganism(Organism organism){
  
                 try{
-                    
+                    System.out.println("Run Next Organism");
                     //run the organism that is passed in and return a fitness score
                     float score = runOrganism(organism);
                     
                     System.out.println("The organism's score is: " + score);
+                    
+                    if(score < 0){
+                        score = 0.1f;
+                    }
                     
                     return score;
                        
@@ -232,7 +236,7 @@ public class Runner implements XmlConversionMethods
 ///////////////////////////GET OBSERVATIONS/////////////////////////////////
             
             if(world_state.getObservations().size() > 0){
-                System.out.println(world_state.getObservations().get(0).getText());
+            //    System.out.println(world_state.getObservations().get(0).getText());
                
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
                 life = root.getInt("Life");
@@ -241,7 +245,12 @@ public class Runner implements XmlConversionMethods
                 mobKilled = root.getInt("MobsKilled");
                 damageTaken = root.getInt("DamageTaken");
                 damageDealt = root.getInt("DamageDealt");
-                timeAlive = root.getInt("TimeAlive");
+                
+                float test = root.getInt("TimeAlive");
+                
+                if(test > timeAlive){
+                    timeAlive = test;
+                }
                 
                 //there are nearby things AKA figure out where the zombie is
                 if(root.has("Entities")){
@@ -254,18 +263,22 @@ public class Runner implements XmlConversionMethods
            
                         if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
                             //the entity is the zombie here.
-                            System.out.println("zombie found");
-                            System.out.println(theEntity);
+                        //    System.out.println("zombie found");
+                        //    System.out.println(theEntity);
                             zombieXPos = (float)theEntity.getDouble("x");
                             zombieZPos = (float)theEntity.getDouble("z");
-                            System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
-                            System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
+                        //    System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
+                        //    System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
                         }
                         i--;
                     }
-                } 
-                //System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+                }
+                else{
+                    zombieXPos = 0;
+                    zombieZPos = 0;
+                }
+               // System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                
             }
             
@@ -278,8 +291,9 @@ public class Runner implements XmlConversionMethods
             System.out.println("Input array looks like: ["+xPos+", "+zPos+", "+zombieXPos+", "+zombieZPos+", "+damageTaken+", "+damageDealt+", "+timeAlive+"]");
 
 
-            input = new float[]{xPos, zPos, zombieXPos, zombieZPos, damageTaken, damageDealt, timeAlive};           
-            output = network.calculate(input);
+           input = new float[]{xPos, zPos, zombieXPos, zombieZPos, damageTaken, damageDealt, timeAlive};           
+           
+           output = network.calculate(input);
            
             
             
@@ -295,7 +309,11 @@ public class Runner implements XmlConversionMethods
                     selection = i;
                 }   
             }
+            selection += 7;
             
+            
+            System.out.println(outputButtonNames.get(selection) + "\n");
+            agent_host.sendCommand(outputButtonNames.get(selection));
             
             //System.out.println("The output node with the greatest value is: " + selection + " with a value of: " + output[selection]);
             

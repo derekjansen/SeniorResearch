@@ -191,21 +191,26 @@ public abstract class Evaluator implements Tuning{
 	/**
 	 * Selects a random species from the species list, where species with a higher total adjusted fitness have a higher chance of being selected
 	 */
-	private Species getRandomSpeciesBiasedAjdustedFitness(Random random) {
-		double completeWeight = 0.0;	// sum of probablities of selecting each species - selection is more probable for species with higher fitness
-		for (Species s : species) {
-            completeWeight += s.totalAdjustedFitness;
-		}
-        double r = Math.random() * completeWeight;
-        double countWeight = 0.0;
-        for (Species s : species) {
-            countWeight += s.totalAdjustedFitness;
-            if (countWeight >= r) {
-            	 return s;
+        private Species getRandomSpeciesBiasedAjdustedFitness(Random random) {
+            double completeWeight = 0.0;	// sum of probablities of selecting each species - selection is more probable for species with higher fitness
+            
+            for (Species s : species) {
+                completeWeight += s.totalAdjustedFitness;
             }
+            
+            double r = Math.random() * completeWeight;
+            
+            double countWeight = 0.0;
+            
+            for (Species s : species) {
+                countWeight += s.totalAdjustedFitness;
+                
+                if (countWeight >= r) {
+                    return s;
+                }
+            }
+            throw new RuntimeException("Couldn't find a species... Number is species in total is " + species.size() + ", and the total adjusted fitness is " + completeWeight);
         }
-        throw new RuntimeException("Couldn't find a species... Number is species in total is "+species.size()+", and the total adjusted fitness is "+completeWeight);
-	}
 	
         
         

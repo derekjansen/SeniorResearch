@@ -106,6 +106,8 @@ public interface Utils {
 		return disjointGenes;
 	}
 	
+        
+        //got a null somehow here
 	public static int countExcessGenes(Organism genome1, Organism genome2) {
 		int excessGenes = 0;
 		
