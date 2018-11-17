@@ -8,15 +8,14 @@ import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
 
 
-public class RuledBased implements XmlConversionMethods
+public class RuledBased implements XmlConversionMethods,FitnessTune
 {
     static Map<Integer,String> outputButtonNames;
-    static double highestScore = 0;
-   // static double oldLife = 0;
-    static int oldMobKilled = 0;
-    static int oldDamageTaken = 0;
-    static int oldDamageDealt = 0;
-    static int oldTimeAlive = 0;
+    
+    static float oldMobKilled = 0;
+    static float oldDamageTaken = 0;
+    static float oldDamageDealt = 0;
+
     static
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
@@ -30,10 +29,10 @@ public class RuledBased implements XmlConversionMethods
         outputButtonNames.put(2,"turn 1");
         outputButtonNames.put(3,"turn -1");
         outputButtonNames.put(4,"attack 1");
-        highestScore = 0.0;
+        float highestScore = 0;
         
          //run for 10 organisms
-        double tempScore = 0;
+        float tempScore = 0;
         for(int i = 0; i < 5; i++){
             System.out.println("Run Started for Organism: " + i);
             tempScore = runOrganism();
@@ -98,12 +97,15 @@ public class RuledBased implements XmlConversionMethods
             double xPos = 0;
             double zPos = 0;
             //double life = 0;
-            int mobKilled = 0;
-            int damageTaken = 0;
-            int damageDealt = 0;
-            int timeAlive = 0;
+            float mobKilled = 0;
+            float damageTaken = 0;
+            float damageDealt = 0;
+            float timeAlive = 0;
             Double zombieXPos = null;
             Double zombieZPos = null;
+            
+            
+            float oldTimeAlive = 0;
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         
         //pause on daylight for a bit
@@ -136,8 +138,9 @@ public class RuledBased implements XmlConversionMethods
                 mobKilled = root.getInt("MobsKilled");
                 damageTaken = root.getInt("DamageTaken");
                 damageDealt = root.getInt("DamageDealt");
-                timeAlive = root.getInt("TimeAlive");
-                
+                if(root.getInt("TimeAlive") != 0){
+                    timeAlive = root.getInt("TimeAlive");
+                }
                 //there are nearby things AKA figure out where the zombie is
                 if(root.has("Entities")){
                     //get array
@@ -170,16 +173,21 @@ public class RuledBased implements XmlConversionMethods
             int sleeptime = 0;
             //do things with some basic logic
             
+            
+            
+            
             //saw zombie and know where it is
             if(zombieXPos != null && zombieZPos != null){
-                double tempX = zombieXPos - xPos;
-                double tempZ = zombieZPos - zPos;
                 
-                if(tempX > 0 || tempZ > 0){
+                //CALCULATE DIRECTION OF ZOMBIE
+                double directionInDegrees = Math.toDegrees(Math.atan2((zombieZPos-zPos),(zombieXPos-xPos)));
+                
+                //turn in correct direction
+                if(directionInDegrees > 0){
                     agent_host.sendCommand("attack 1");
                     agent_host.sendCommand("turn 1");
                     System.out.println("Saw zombie: turn 1");
-                }else if (tempX < 0 || tempZ < 0){
+                }else if (directionInDegrees < 0){
                     agent_host.sendCommand("attack 1");
                     agent_host.sendCommand("turn -1");
                      System.out.println("Saw zombie: turn -1");
@@ -204,11 +212,7 @@ public class RuledBased implements XmlConversionMethods
                     sleeptime = 200;
                 }
             }
-            
-            
-            
-            
-            
+           
             try {
                 Thread.sleep(sleeptime);
             } catch(InterruptedException ex) {
@@ -228,16 +232,10 @@ public class RuledBased implements XmlConversionMethods
         
         System.out.println( "Mission has stopped." );
        
-        
-        //FIX THESE CUZ THEY WACK
-        
-        
         //get correct run scores since the stats for the organism persists between runs
          timeAlive = timeAlive - oldTimeAlive;
-         if(oldTimeAlive != 0){
-            oldTimeAlive = oldTimeAlive + timeAlive; 
-         }
-         
+        oldTimeAlive = oldTimeAlive + timeAlive; 
+          
         damageDealt = damageDealt - oldDamageDealt;
         oldDamageDealt = oldDamageDealt + damageDealt;
         
@@ -251,7 +249,7 @@ public class RuledBased implements XmlConversionMethods
         System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
         //calulate score here
-        return (float) ((1.0 * timeAlive) + (20.0 * damageDealt) + (50.0 * mobKilled) - (100.00 * damageTaken));
+        return ((timeReward * timeAlive) + (damageDealtReward * damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * damageTaken));
         
         
         

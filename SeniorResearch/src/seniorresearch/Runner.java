@@ -15,12 +15,8 @@ import neat.NodeGene;
 import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
 
-public class Runner implements XmlConversionMethods
+public class Runner implements XmlConversionMethods,FitnessTune
 {
-    static float timeReward = 15.0f;
-    static float damageDealtReward = 20.0f;
-    static float damageRecievedReward = 50.0f;
-    static float zombiesKilledReward = 50.0f;
     
     //hold node number and input/output actions
     static Map<Integer,String> outputButtonNames;
@@ -91,11 +87,10 @@ public class Runner implements XmlConversionMethods
         organism.addConnectionGene(new ConnectionGene(n1,n8,0.5f,true,c1));
         
         
-         //create evaluator and pass in the starting organism, and the counters for the two types of connections
+        //create evaluator and pass in the starting organism, and the counters for the two types of connections
         Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
             
-            //THIS IS WHERE I CODE HOW TO EVALUATE THE Organism
             protected float evaluateOrganism(Organism organism){
  
                 try{
@@ -105,8 +100,9 @@ public class Runner implements XmlConversionMethods
                     
                     System.out.println("The organism's score is: " + score);
                     
+                    //if score is negative, we give it a very low score so that it is > 0
                     if(score < 0){
-                        score = 0.1f;
+                        score = 0.01f;
                     }
                     
                     return score;
@@ -131,7 +127,12 @@ public class Runner implements XmlConversionMethods
             System.out.print("Generation: " + i);
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
-        }         
+        }  
+        
+        
+        //RETRIEVE THE BEST ORGANISM OF THE RUN AND SHOW/SAVE
+        System.out.println(eval.getMostFitOrganism().getConnectionGenes().size());
+        System.out.println(eval.getMostFitOrganism().getNodeGenes().size());
         
     }
     
@@ -169,11 +170,6 @@ public class Runner implements XmlConversionMethods
         MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
-        //my_mission_record.recordCommands();
-        //my_mission_record.recordMP4(20, 400000);
-        //my_mission_record.recordRewards();
-        //my_mission_record.recordObservations();
-        
 
         try {
             agent_host.startMission( my_mission, my_mission_record);
@@ -292,7 +288,7 @@ public class Runner implements XmlConversionMethods
             
             System.out.println("Input array looks like: ["+xPos+", "+zPos+", "+zombieXPos+", "+zombieZPos+", "+damageTaken+", "+damageDealt+"]");
 
-
+            //passing in coordinates of the player, coordinates of the zombie, damagetaken, damagedealt
            input = new float[]{xPos, zPos, zombieXPos, zombieZPos, damageTaken, damageDealt};           
            
            output = network.calculate(input);
@@ -314,6 +310,7 @@ public class Runner implements XmlConversionMethods
                     System.out.println("Selection = " + selection);
                 }   
             }
+            //fix spot in map
             selection += 7;
             
             

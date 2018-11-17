@@ -1,6 +1,9 @@
 
 package test;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import neat.ConnectionGene;
 import neat.Counter;
 import neat.Evaluator;
@@ -13,7 +16,13 @@ import neat.Organism;
  * @author derekgrove
  */
 public class TestWithCorrectNodes {
-    public static void main(String argv[]){
+    public static void main(String argv[]) throws FileNotFoundException{
+        
+        //PrintStream out = new PrintStream(new FileOutputStream("testoutput.txt", true), true);
+        //System.setOut(out);
+        
+        System.out.println(Math.toDegrees(Math.atan2(-2.0, 9.0)));
+        
         
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
@@ -55,10 +64,9 @@ public class TestWithCorrectNodes {
         
         //create the base connection between one and one
         int c1 = connectionInnovation.getInnovation();
-        int c2 = connectionInnovation.getInnovation();
         //add these to the organism
         organism.addConnectionGene(new ConnectionGene(n1,n8,0.5f,true,c1));
-       // organism.addConnectionGene(new ConnectionGene(n1,n9,0.5f,true,c2));
+       
         
         
         
@@ -71,11 +79,11 @@ public class TestWithCorrectNodes {
                 
               float[] input = {5.0f, 5.0f, -1.0f, -1.0f, 1000.0f, 0.0f};
               NeuralNetwork net = new NeuralNetwork(organism);
-                System.out.println("\nNew Organism");
-              for(int i = 3; i > 0; i-- ){
+               // System.out.println("\nNew Organism");
+              
                 float output[]= net.calculate(input);
-                System.out.println("\tOutput node 1= " + output[0] + "\n\tOutput node 2= " + output[1] + "\n\tOutput node 3= " + output[2]+ "\n\tOutput node 4= " + output[3]+ "\n\tOutput node 5= " + output[4]);
-              }
+               // System.out.println("\tOutput node 1= " + output[0] + "\n\tOutput node 2= " + output[1] + "\n\tOutput node 3= " + output[2]+ "\n\tOutput node 4= " + output[3]+ "\n\tOutput node 5= " + output[4]);
+              
               
               return organism.getConnectionGenes().values().size();
                 
@@ -90,12 +98,15 @@ public class TestWithCorrectNodes {
             System.out.print("Generation: " + i);
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
-            if (i==0) {
-                    //LegacyOrganismPrinter.printOrganism(eval.getMostFitOrganism(), "/"+i+".png");
+            if (i % 99 == 0) {
                     OrganismPrinter printer = new OrganismPrinter();
-                    printer.showOrganism(eval.getMostFitOrganism(), "");
+                    printer.showOrganism(eval.getMostFitOrganism(), ""+i);
             }
             
-        } 
+            
+        }
+        
+        System.out.println(eval.getMostFitOrganism());
+        System.out.println("/n");
     }
 }
