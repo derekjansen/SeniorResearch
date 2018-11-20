@@ -20,9 +20,7 @@ public class TestWithCorrectNodes {
         
         //PrintStream out = new PrintStream(new FileOutputStream("testoutput.txt", true), true);
         //System.setOut(out);
-        
-        System.out.println(Math.toDegrees(Math.atan2(-2.0, 9.0)));
-        
+                
         
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
@@ -49,7 +47,6 @@ public class TestWithCorrectNodes {
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n3));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
         
 
                 
@@ -65,7 +62,7 @@ public class TestWithCorrectNodes {
         //create the base connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n1,n8,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n5,n12,0.5f,true,c1));
        
         
         
@@ -77,7 +74,7 @@ public class TestWithCorrectNodes {
             
             protected float evaluateOrganism(Organism organism){
                 
-              float[] input = {5.0f, 5.0f, -1.0f, -1.0f, 1000.0f, 0.0f};
+              float[] input = {5.0f, 5.0f, -1.0f, -1.0f, 1.0f};
               NeuralNetwork net = new NeuralNetwork(organism);
                // System.out.println("\nNew Organism");
               
@@ -100,13 +97,10 @@ public class TestWithCorrectNodes {
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
             if (i % 99 == 0) {
                     OrganismPrinter printer = new OrganismPrinter();
-                    printer.showOrganism(eval.getMostFitOrganism(), ""+i);
+                    printer.showOrganism(eval.getMostFitOrganism(), "" + i);
             }
             
             
         }
-        
-        System.out.println(eval.getMostFitOrganism());
-        System.out.println("/n");
     }
 }

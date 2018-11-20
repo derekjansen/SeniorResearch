@@ -20,6 +20,9 @@ public class Runner implements XmlConversionMethods,FitnessTune
     
     //hold node number and input/output actions
     static Map<Integer,String> outputButtonNames;
+    static float oldMobKilled = 0;
+    static float oldDamageTaken = 0;
+    static float oldDamageDealt = 0;
     
     static
     {        
@@ -63,7 +66,6 @@ public class Runner implements XmlConversionMethods,FitnessTune
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n3));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
         
 
                 
@@ -81,10 +83,10 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         
         
-        //create the base connection between one and one
+        //create the base bias connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n1,n8,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n5,n12,0.5f,true,c1));
         
         
         //create evaluator and pass in the starting organism, and the counters for the two types of connections
@@ -207,9 +209,6 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
 ///////////////////////////////////// MAIN LOOP ////////////////////////////////////////////////////////// 
         
-        float oldMobKilled = 0;
-        float oldDamageTaken = 0;
-        float oldDamageDealt = 0;
         float oldTimeAlive = 0;
         
         
@@ -227,8 +226,12 @@ public class Runner implements XmlConversionMethods,FitnessTune
         //Spawn zombie in the corner
         agent_host.sendCommand("chat /summon zombie 11 228 11");
         
+        //if a zombie was seen
+        boolean zombieTrigger;
+        
     do {
-
+        //reset to not seen each time
+        zombieTrigger = false;
 ///////////////////////////GET OBSERVATIONS/////////////////////////////////
             
             if(world_state.getObservations().size() > 0){
@@ -258,8 +261,10 @@ public class Runner implements XmlConversionMethods,FitnessTune
                         JSONObject theEntity = theEntityArray.getJSONObject(i);
            
                         if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
+                            //zombie was found
+                            zombieTrigger = true;
                             //the entity is the zombie here.
-                        //    System.out.println("zombie found");
+                            System.out.println("zombie found");
                         //    System.out.println(theEntity);
                             zombieXPos = (float)theEntity.getDouble("x");
                             zombieZPos = (float)theEntity.getDouble("z");
@@ -285,11 +290,23 @@ public class Runner implements XmlConversionMethods,FitnessTune
             
             
 ///////////////////////////plug in observations and send to neural net////////////////
+
+            float bias = 1.0f;
+            float directionOfZombie = -1;
+            float distanceToZombie = -1;
             
-            System.out.println("Input array looks like: ["+xPos+", "+zPos+", "+zombieXPos+", "+zombieZPos+", "+damageTaken+", "+damageDealt+"]");
+            //if a zombie was found, figure out direction and distance
+            if(zombieTrigger){
+                //CALCULATE DIRECTION OF ZOMBIE
+                directionOfZombie = (float)Math.toDegrees(Math.atan2((zombieZPos-zPos),(zombieXPos-xPos)));
+
+                //Calculate Distance of Zombie
+                distanceToZombie = (float)Math.hypot((zombieXPos-xPos), (zombieZPos-zPos));
+            }
+            System.out.println("Input array looks like: ["+directionOfZombie+", "+distanceToZombie+", "+damageTaken+", "+damageDealt+","+bias+"]");
 
             //passing in coordinates of the player, coordinates of the zombie, damagetaken, damagedealt
-           input = new float[]{xPos, zPos, zombieXPos, zombieZPos, damageTaken, damageDealt};           
+           input = new float[]{directionOfZombie, distanceToZombie, damageTaken, damageDealt, bias};           
            
            output = network.calculate(input);
            
@@ -343,9 +360,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
 ////////////////////////////////calculate  and return score ///////////////////////////////
         timeAlive = timeAlive - oldTimeAlive;
-         if(oldTimeAlive != 0){
-            oldTimeAlive = oldTimeAlive + timeAlive; 
-         }
+        oldTimeAlive = oldTimeAlive + timeAlive; 
          
         damageDealt = damageDealt - oldDamageDealt;
         oldDamageDealt = oldDamageDealt + damageDealt;

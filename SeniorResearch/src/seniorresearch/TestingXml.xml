@@ -6,35 +6,40 @@
     <ServerSection>
         <ServerInitialConditions>
             <Time>
-                <StartTime>15000</StartTime>
+                <StartTime>1000</StartTime>
                 <AllowPassageOfTime>false</AllowPassageOfTime>
             </Time>
         </ServerInitialConditions>
         <ServerHandlers>
             <FlatWorldGenerator generatorString="3;7,220*1,5*3,2;3;,biome_1"/>
             <DrawingDecorator>
-                <DrawLine x1="0" y1="227" z1="0" x2="0" y2="227" z2="2" type="stone"/>
-                <DrawLine x1="0" y1="229" z1="0" x2="0" y2="229" z2="2" type="glass"/>
+                <DrawLine x1="0" y1="227" z1="0" x2="0" y2="227" z2="5" type="stone"/>
+                <DrawLine x1="0" y1="229" z1="0" x2="0" y2="229" z2="5" type="glass"/>
+                <DrawLine x1="0" y1="228" z1="0" x2="0" y2="228" z2="5" type="glass"/>
                 
-                <DrawLine x1="0" y1="227" z1="2" x2="2" y2="227" z2="2" type="stone" />
-                <DrawLine x1="0" y1="229" z1="2" x2="2" y2="229" z2="2" type="glass" />
+                <DrawLine x1="0" y1="227" z1="5" x2="5" y2="227" z2="5" type="stone" />
+                <DrawLine x1="0" y1="229" z1="5" x2="5" y2="229" z2="5" type="glass" />
+                <DrawLine x1="0" y1="228" z1="5" x2="5" y2="228" z2="5" type="glass" />
                 
-                <DrawLine x1="2" y1="227" z1="2" x2="2" y2="227" z2="0" type="stone" />
-                <DrawLine x1="2" y1="229" z1="2" x2="2" y2="229" z2="0" type="glass" />
+                <DrawLine x1="5" y1="227" z1="5" x2="5" y2="227" z2="0" type="stone" />
+                <DrawLine x1="5" y1="229" z1="5" x2="5" y2="229" z2="0" type="glass" />
+                <DrawLine x1="5" y1="228" z1="5" x2="5" y2="228" z2="0" type="glass" />
                 
-                <DrawLine x1="2" y1="227" z1="0" x2="0" y2="227" z2="0" type="stone" />
-                <DrawLine x1="2" y1="229" z1="0" x2="0" y2="229" z2="0" type="glass" />
-  
+                <DrawLine x1="5" y1="227" z1="0" x2="0" y2="227" z2="0" type="stone" />
+                <DrawLine x1="5" y1="229" z1="0" x2="0" y2="229" z2="0" type="glass" />
+                <DrawLine x1="5" y1="228" z1="0" x2="0" y2="228" z2="0" type="glass" />
+                
+                <DrawEntity x="1" y="228" z="1" type="Pig"/>
                 
             </DrawingDecorator>
-            <ServerQuitFromTimeUp timeLimitMs="60000"/>
+            <ServerQuitFromTimeUp timeLimitMs="160000"/>
             <ServerQuitWhenAnyAgentFinishes/>
         </ServerHandlers>
     </ServerSection>
     <AgentSection>
         <Name>A default agent</Name>
         <AgentStart>
-            <Placement x="1" y="230" z="-1" yaw="90"/>
+            <Placement x="2" y="230" z="2" yaw="0"/>
             <Inventory>
                 <InventoryItem slot="0" type="diamond_sword" />
                <InventoryItem slot="39" type="diamond_helmet" />
@@ -47,16 +52,16 @@
             <ChatCommands/>
             <ContinuousMovementCommands/>
             <ObservationFromNearbyEntities>
-                <Range name="Entities" xrange="10" yrange="2" zrange="10" update_frequency="20"/>
+                <Range name="Entities" xrange="8" yrange="2" zrange="6" />
             </ObservationFromNearbyEntities>
+            
             <ObservationFromFullStats/>
+            
             <VideoProducer viewpoint="1">
-                <Width>800</Width>
-                <Height>600</Height>
-            </VideoProducer>
-            <RewardForReachingPosition>
-                <Marker x="19.5" y="0" z="19.5" reward="100" tolerance="1.10000002"/>
-            </RewardForReachingPosition>
+                <Width>640</Width>
+                <Height>480</Height>
+            </VideoProducer> 
+            
         </AgentHandlers>
     </AgentSection>
 </Mission>

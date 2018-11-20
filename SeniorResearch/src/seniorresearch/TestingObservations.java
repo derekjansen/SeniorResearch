@@ -13,10 +13,10 @@ public class TestingObservations implements XmlConversionMethods
     static Map<Integer,String> outputButtonNames;
     static double highestScore = 0;
    // static double oldLife = 0;
-    static int oldMobKilled = 0;
-    static int oldDamageTaken = 0;
-    static int oldDamageDealt = 0;
-    static int oldTimeAlive = 0;
+    static float oldMobKilled = 0;
+    static float oldDamageTaken = 0;
+    static float oldDamageDealt = 0;
+    
     static
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
@@ -98,16 +98,16 @@ public class TestingObservations implements XmlConversionMethods
             double xPos = 0;
             double zPos = 0;
             //double life = 0;
-            int mobKilled = 0;
-            int damageTaken = 0;
-            int damageDealt = 0;
-            int timeAlive = 0;
-            
+            float mobKilled = 0;
+            float damageTaken = 0;
+            float damageDealt = 0;
+            float timeAlive = 0;
+            float oldTimeAlive = 0;
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         
 
         //Spawn zombie in the corner
-        agent_host.sendCommand("chat /summon zombie 1 228 1");
+        //agent_host.sendCommand("chat /summon pig 1 228 1");
         
         
         do {
@@ -135,15 +135,20 @@ public class TestingObservations implements XmlConversionMethods
                    
                     while(i > -1){
                         JSONObject theEntity = theEntityArray.getJSONObject(i);
-           
-                        if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
-                            //the entity is the zombie here.
-                            System.out.println("Found the zombie");
-                          //  System.out.println(theEntity);
-                            System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
-                            System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
+                        
+                        if(theEntity.getString("name").equalsIgnoreCase("pig")){
+                            //the entity is the pig here.
+                            System.out.println("Found the pig");
+                            System.out.println(theEntity);
+                            System.out.println("The pig' lifepoints are: " + theEntity.getInt("life"));
+                            System.out.println("The pig coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
                         }
+                        
+                        
+                        
+                        
+                        
                         i--;
                     }
                 }
@@ -161,7 +166,7 @@ public class TestingObservations implements XmlConversionMethods
           
             
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
                 return 0;
@@ -179,12 +184,6 @@ public class TestingObservations implements XmlConversionMethods
 
         
         System.out.println( "Mission has stopped." );
-       
-        
-        //FIX THESE CUZ THEY WACK
-        
-        timeAlive = timeAlive - oldTimeAlive;
-        oldTimeAlive = oldTimeAlive + timeAlive;
         
         //get correct run scores since the stats for the organism persists between runs
         timeAlive = timeAlive - oldTimeAlive;
