@@ -30,8 +30,8 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
     {
         
         //Set up stream to print to
-        PrintStream out = new PrintStream(new FileOutputStream("buttonMashingData.txt", true), true);
-        System.setOut(out);
+       // PrintStream out = new PrintStream(new FileOutputStream("buttonMashingData.txt", true), true);
+       // System.setOut(out);
         
         System.out.println("Organism Number,Time Alive,Damage Dealt,Damage Taken,Score");
         

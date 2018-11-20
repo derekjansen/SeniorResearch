@@ -2,8 +2,7 @@
 package test;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.util.Random;
 import neat.ConnectionGene;
 import neat.Counter;
 import neat.Evaluator;
@@ -47,7 +46,7 @@ public class TestWithCorrectNodes {
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n3));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
-        
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
 
                 
         //number of output node is associated with the "buttons" that can be pressed
@@ -62,7 +61,7 @@ public class TestWithCorrectNodes {
         //create the base connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n5,n12,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n6,n12,0.5f,true,c1));
        
         
         
@@ -74,7 +73,10 @@ public class TestWithCorrectNodes {
             
             protected float evaluateOrganism(Organism organism){
                 
-              float[] input = {5.0f, 5.0f, -1.0f, -1.0f, 1.0f};
+              Random r = new Random();
+              float rand = r.nextFloat();
+              float[] input = {5.0f%rand, 4.0f%rand, -1.0f%rand, -2.0f%rand, 3.0f%rand, 1.0f};
+              
               NeuralNetwork net = new NeuralNetwork(organism);
                // System.out.println("\nNew Organism");
               

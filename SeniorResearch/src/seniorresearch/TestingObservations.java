@@ -97,6 +97,7 @@ public class TestingObservations implements XmlConversionMethods
        
             double xPos = 0;
             double zPos = 0;
+            double yaw = 0f;
             //double life = 0;
             float mobKilled = 0;
             float damageTaken = 0;
@@ -105,17 +106,21 @@ public class TestingObservations implements XmlConversionMethods
             float oldTimeAlive = 0;
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         
-
+        double pigX;
+        double pigZ;
         //Spawn zombie in the corner
         //agent_host.sendCommand("chat /summon pig 1 228 1");
         
         
         do {
-            
-            
+            pigX = 0;
+            pigZ = 0;
              //////////GET OBSERVATIONS/////////////
             
             if(world_state.getObservations().size() > 0){
+                
+                try{
+                
                 System.out.println(world_state.getObservations().get(0).getText());
                
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
@@ -126,6 +131,7 @@ public class TestingObservations implements XmlConversionMethods
                 damageTaken = root.getInt("DamageTaken");
                 damageDealt = root.getInt("DamageDealt");
                 timeAlive = root.getInt("TimeAlive");
+                yaw = Math.abs(root.getDouble("Yaw"));
                 
                 //there are nearby things AKA figure out where the zombie is
                 if(root.has("Entities")){
@@ -141,7 +147,9 @@ public class TestingObservations implements XmlConversionMethods
                             System.out.println("Found the pig");
                             System.out.println(theEntity);
                             System.out.println("The pig' lifepoints are: " + theEntity.getInt("life"));
-                            System.out.println("The pig coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
+                            pigX = theEntity.getDouble("x");
+                            pigZ = theEntity.getDouble("z");
+                            System.out.println("The pig coordinates are: " + pigX + " , " + pigZ);
    
                         }
                         
@@ -154,10 +162,34 @@ public class TestingObservations implements XmlConversionMethods
                 }
                 
                 System.out.println("PLAYER STATS:    timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+                }catch(Exception ex){
+                    System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTHERE WAS A WEIRD PROBLEM: " + ex);
+                }
                 
             }
             
-            
+            if(pigX != 0){
+                double directionInDegrees = Math.toDegrees(Math.atan2((pigZ-zPos),(pigX-xPos)));
+               // if(directionInDegrees >= 0){
+               //     System.out.println("The direction of the pig is: right");
+               // }else{
+               //     System.out.println("The direction of the pig is: left");
+               // }
+                
+                 System.out.println("The direction of the pig is: " + directionInDegrees);
+                 System.out.println("The player yaw is: "+ yaw);
+                 
+                 
+                 
+                 
+                 //DIRECTIONINDEGREES DOES NOT GIVE TO TURN LEFT OR RIGHT. IT ONLY TELLS LOCATION OF CHARACTER
+                 //VERSUS THE PIG
+                 
+                 
+                 
+                double distanceToPig = (float)Math.hypot((pigX-xPos), (pigZ-zPos));
+                System.out.println("The distance of the pig is: " + distanceToPig);
+            }
             
             
             ////////////randomized outputs to mimic button mashing///////////////
@@ -198,8 +230,8 @@ public class TestingObservations implements XmlConversionMethods
         mobKilled = mobKilled - oldMobKilled;
         oldMobKilled = oldMobKilled + mobKilled;
         
-        
-        System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
+        System.out.println("");
+       // System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
         //calulate score here
         return (float) ((1.0 * timeAlive) + (20.0 * damageDealt) + (50.0 * mobKilled) - (100.00 * damageTaken));

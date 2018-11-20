@@ -29,7 +29,7 @@
                 <DrawLine x1="5" y1="229" z1="0" x2="0" y2="229" z2="0" type="glass" />
                 <DrawLine x1="5" y1="228" z1="0" x2="0" y2="228" z2="0" type="glass" />
                 
-                <DrawEntity x="1" y="228" z="1" type="Pig"/>
+                <DrawEntity x="1" y="228" z="1" type="Pig"/> 
                 
             </DrawingDecorator>
             <ServerQuitFromTimeUp timeLimitMs="160000"/>
@@ -39,7 +39,7 @@
     <AgentSection>
         <Name>A default agent</Name>
         <AgentStart>
-            <Placement x="2" y="230" z="2" yaw="0"/>
+            <Placement x="2" y="230" z="2" yaw="0"/> 
             <Inventory>
                 <InventoryItem slot="0" type="diamond_sword" />
                <InventoryItem slot="39" type="diamond_helmet" />
@@ -52,12 +52,12 @@
             <ChatCommands/>
             <ContinuousMovementCommands/>
             <ObservationFromNearbyEntities>
-                <Range name="Entities" xrange="8" yrange="2" zrange="6" />
+               <Range name="Entities" xrange="8" yrange="2" zrange="6" /> 
             </ObservationFromNearbyEntities>
             
             <ObservationFromFullStats/>
             
-            <VideoProducer viewpoint="1">
+            <VideoProducer viewpoint="0">
                 <Width>640</Width>
                 <Height>480</Height>
             </VideoProducer> 

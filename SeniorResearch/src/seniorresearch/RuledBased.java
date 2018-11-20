@@ -1,6 +1,8 @@
 
 package seniorresearch;
 import com.microsoft.msr.malmo.*;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -23,6 +25,12 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
     
     public static void main(String argv[]) throws Exception
     {
+        //Set up stream to print to
+      //  PrintStream out = new PrintStream(new FileOutputStream("RuleBasedData.txt", true), true);
+      //  System.setOut(out);
+        
+        System.out.println("Organism Number,Time Alive,Damage Dealt,Damage Taken,Score");
+        
         outputButtonNames = new HashMap(); 
         outputButtonNames.put(0,"move 1");
         outputButtonNames.put(1,"move -1");
@@ -34,13 +42,16 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
          //run for 10 organisms
         float tempScore = 0;
         for(int i = 0; i < 5; i++){
-            System.out.println("Run Started for Organism: " + i);
-            tempScore = runOrganism();
-            System.out.println("The score for this organism: " + tempScore + "\n");
+          //  System.out.println("Run Started for Organism: " + i);
+          System.out.println("Run Started for Organism: " + i);  
+          tempScore = runOrganism();
+          
+          System.out.println(tempScore);
+         //   System.out.println("The score for this organism: " + tempScore + "\n");
             if(tempScore > highestScore)
                 highestScore = tempScore;
         } 
-        System.out.println("The highest Fitness achieved was: " + highestScore);
+      //  System.out.println("The highest Fitness achieved was: " + highestScore);
      
     }
     
@@ -182,6 +193,13 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
                 //CALCULATE DIRECTION OF ZOMBIE
                 double directionInDegrees = Math.toDegrees(Math.atan2((zombieZPos-zPos),(zombieXPos-xPos)));
                 
+                
+                
+                //ADD THING HERE BECAUSE THE DIRECTION DOES NOT MEAN LEFT OR RIGHT. IT IS 
+                // A DEGREE IN THE COORDINATE PLANE SYSTEM.
+                
+                
+                
                 //turn in correct direction
                 if(directionInDegrees > 0){
                     agent_host.sendCommand("attack 1");
@@ -247,6 +265,9 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
         
         
         System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
+        
+        
+        System.out.print(timeAlive+","+damageDealt+","+damageTaken + ",");
         
         //calulate score here
         return ((timeReward * timeAlive) + (damageDealtReward * damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * damageTaken));

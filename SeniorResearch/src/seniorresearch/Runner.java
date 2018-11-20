@@ -66,7 +66,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n3));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
-        
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
 
                 
         //number of output node is associated with the "buttons" that can be pressed
@@ -86,7 +86,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         //create the base bias connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n5,n12,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n6,n12,0.5f,true,c1));
         
         
         //create evaluator and pass in the starting organism, and the counters for the two types of connections
@@ -154,14 +154,15 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         //other needed variables 
         float life = 0;
-        float xPos = 0;
-        float zPos = 0;
+        double xPos = 0;
+        double zPos = 0;
         float mobKilled = 0;
         float damageTaken = 0;
         float damageDealt = 0;
         float timeAlive = 0;
         float zombieXPos = -1;
         float zombieZPos = -1;
+        double playerYaw = 0;
         
         
 /////////////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
@@ -236,11 +237,13 @@ public class Runner implements XmlConversionMethods,FitnessTune
             
             if(world_state.getObservations().size() > 0){
             //    System.out.println(world_state.getObservations().get(0).getText());
-               
+               try{
+                   
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
                 life = root.getInt("Life");
-                xPos = root.getInt("XPos");
-                zPos = root.getInt("ZPos");
+                xPos = root.getDouble("XPos");
+                zPos = root.getDouble("ZPos");
+                playerYaw = root.getDouble("Yaw");
                 mobKilled = root.getInt("MobsKilled");
                 damageTaken = root.getInt("DamageTaken");
                 damageDealt = root.getInt("DamageDealt");
@@ -282,7 +285,10 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 }
                 
                // System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
-               
+               }catch(Exception ex){
+                   
+               }
+                   
             }
             
             
@@ -303,10 +309,10 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 //Calculate Distance of Zombie
                 distanceToZombie = (float)Math.hypot((zombieXPos-xPos), (zombieZPos-zPos));
             }
-            System.out.println("Input array looks like: ["+directionOfZombie+", "+distanceToZombie+", "+damageTaken+", "+damageDealt+","+bias+"]");
+            System.out.println("Input array looks like: ["+directionOfZombie+", "+distanceToZombie+", "+damageTaken+", "+damageDealt+","+ playerYaw +","+bias+"]");
 
             //passing in coordinates of the player, coordinates of the zombie, damagetaken, damagedealt
-           input = new float[]{directionOfZombie, distanceToZombie, damageTaken, damageDealt, bias};           
+           input = new float[]{directionOfZombie, distanceToZombie, damageTaken, damageDealt, (float)playerYaw, bias};           
            
            output = network.calculate(input);
            
