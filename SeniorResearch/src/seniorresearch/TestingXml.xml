@@ -29,10 +29,10 @@
                 <DrawLine x1="5" y1="229" z1="0" x2="0" y2="229" z2="0" type="glass" />
                 <DrawLine x1="5" y1="228" z1="0" x2="0" y2="228" z2="0" type="glass" />
                 
-                <DrawEntity x="1" y="228" z="1" type="Pig"/> 
+               <DrawEntity x="1" y="228" z="1" type="Pig"/>  
                 
             </DrawingDecorator>
-            <ServerQuitFromTimeUp timeLimitMs="160000"/>
+            <ServerQuitFromTimeUp timeLimitMs="60000"/>
             <ServerQuitWhenAnyAgentFinishes/>
         </ServerHandlers>
     </ServerSection>

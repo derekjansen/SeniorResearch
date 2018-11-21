@@ -1,6 +1,7 @@
 
 package seniorresearch;
 import com.microsoft.msr.malmo.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -46,10 +47,14 @@ public class Runner implements XmlConversionMethods,FitnessTune
         //make a new organism
         Organism organism = new Organism();
         
-        //create nodeGenes
+        //bias
         int n1 = nodeInnovation.getInnovation();
+        //damage taken
         int n2 = nodeInnovation.getInnovation();
+        //damage dealt
         int n3 = nodeInnovation.getInnovation();
+        
+        //zombie location
         int n4 = nodeInnovation.getInnovation();
         int n5 = nodeInnovation.getInnovation();
         int n6 = nodeInnovation.getInnovation();
@@ -59,6 +64,31 @@ public class Runner implements XmlConversionMethods,FitnessTune
         int n10 = nodeInnovation.getInnovation();
         int n11 = nodeInnovation.getInnovation();
         int n12 = nodeInnovation.getInnovation();
+        int n13 = nodeInnovation.getInnovation();
+        int n14 = nodeInnovation.getInnovation();
+        int n15 = nodeInnovation.getInnovation();
+        int n16 = nodeInnovation.getInnovation();
+        int n17 = nodeInnovation.getInnovation();
+        int n18 = nodeInnovation.getInnovation();
+        int n19 = nodeInnovation.getInnovation();
+        
+        //player looking direction
+        int n20 = nodeInnovation.getInnovation();
+        int n21 = nodeInnovation.getInnovation();
+        int n22 = nodeInnovation.getInnovation();
+        int n23 = nodeInnovation.getInnovation();
+        int n24 = nodeInnovation.getInnovation();
+        int n25 = nodeInnovation.getInnovation();
+        int n26 = nodeInnovation.getInnovation();
+        int n27 = nodeInnovation.getInnovation();
+        
+        //outputs
+        int n28 = nodeInnovation.getInnovation();
+        int n29 = nodeInnovation.getInnovation();
+        int n30 = nodeInnovation.getInnovation();
+        int n31 = nodeInnovation.getInnovation();
+        int n32 = nodeInnovation.getInnovation();
+        
         
         //number of input node is associated with the type of input       
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
@@ -67,26 +97,49 @@ public class Runner implements XmlConversionMethods,FitnessTune
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
-
-                
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n7));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n8));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n9));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n10));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n11));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n12));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n13));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n14));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n15));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n16));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n17));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n18));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n19));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n20));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n21));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n22));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n23));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n24));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n25));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n26));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n27));  
+        
+        
         //number of output node is associated with the "buttons" that can be pressed
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n8));
-        outputButtonNames.put(n8,"move 1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n9));
-        outputButtonNames.put(n9,"move -1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n10));
-        outputButtonNames.put(n10,"turn 1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n11));
-        outputButtonNames.put(n11,"turn -1");
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n12));
-        outputButtonNames.put(n12,"attack 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n28));
+        outputButtonNames.put(n28,"move 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n29));
+        outputButtonNames.put(n29,"move -1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n30));
+        outputButtonNames.put(n30,"turn 1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n31));
+        outputButtonNames.put(n31,"turn -1");
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n32));
+        outputButtonNames.put(n32,"attack 1");
+        
+       
         
         
         
         //create the base bias connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n6,n12,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n1,n32,0.5f,true,c1));
         
         
         //create evaluator and pass in the starting organism, and the counters for the two types of connections
@@ -130,11 +183,6 @@ public class Runner implements XmlConversionMethods,FitnessTune
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
         }  
-        
-        
-        //RETRIEVE THE BEST ORGANISM OF THE RUN AND SHOW/SAVE
-        System.out.println(eval.getMostFitOrganism().getConnectionGenes().size());
-        System.out.println(eval.getMostFitOrganism().getNodeGenes().size());
         
     }
     
@@ -225,18 +273,30 @@ public class Runner implements XmlConversionMethods,FitnessTune
         //turn to night
         agent_host.sendCommand("chat /time set 15000");
         //Spawn zombie in the corner
-        agent_host.sendCommand("chat /summon zombie 11 228 11");
+        agent_host.sendCommand("chat /summon zombie 11 228 11 {IsBaby:0}");
+        
+        
+        //SOME Vars
         
         //if a zombie was seen
         boolean zombieTrigger;
+        float bias = 1.0f;
+        //zombie positions
+        float p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27;
+        //yaw values;
+        float y10,y11,y12,y13,y14,y15,y16,y17;
+        
+        
         
     do {
+        
         //reset to not seen each time
         zombieTrigger = false;
+        
 ///////////////////////////GET OBSERVATIONS/////////////////////////////////
             
             if(world_state.getObservations().size() > 0){
-            //    System.out.println(world_state.getObservations().get(0).getText());
+                System.out.println(world_state.getObservations().get(0).getText());
                try{
                    
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
@@ -267,24 +327,21 @@ public class Runner implements XmlConversionMethods,FitnessTune
                             //zombie was found
                             zombieTrigger = true;
                             //the entity is the zombie here.
-                            System.out.println("zombie found");
+                        //    System.out.println("zombie found");
                         //    System.out.println(theEntity);
                             zombieXPos = (float)theEntity.getDouble("x");
                             zombieZPos = (float)theEntity.getDouble("z");
                         //    System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
                         //    System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
    
-                        }else{
-                            zombieXPos = -1;
-                            zombieZPos = -1;
-                         }
+                        }
                         
                         i--;
                     }
                     
                 }
                 
-               // System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
+                //System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                }catch(Exception ex){
                    
                }
@@ -296,25 +353,111 @@ public class Runner implements XmlConversionMethods,FitnessTune
             
             
 ///////////////////////////plug in observations and send to neural net////////////////
+            
+            //SCALE DAMAGE THINGS TO 0-1
+            
+            
+            //normalizedDamageDealt =
+            //normalizedDamageTaken = 
+            
+           // HERE
+            
+            
 
-            float bias = 1.0f;
+            
             float directionOfZombie = -1;
             float distanceToZombie = -1;
-            
+            p10=p11=p12=p13=p14=p15=p16=p17=p20=p21=p22=p23=p24=p25=p26=p27=y10=y11=y12=y13=y14=y15=y16=y17= 0;
+            int sector,yawSector = 0;
+           
             //if a zombie was found, figure out direction and distance
             if(zombieTrigger){
-                //CALCULATE DIRECTION OF ZOMBIE
-                directionOfZombie = (float)Math.toDegrees(Math.atan2((zombieZPos-zPos),(zombieXPos-xPos)));
-
+                
                 //Calculate Distance of Zombie
                 distanceToZombie = (float)Math.hypot((zombieXPos-xPos), (zombieZPos-zPos));
+                //CALCULATE DIRECTION OF ZOMBIE
+                directionOfZombie = (float)Math.toDegrees(Math.atan2((zombieZPos-zPos),(zombieXPos-xPos)));
+                //determine which section around the player is active
+                sector = (int)directionOfZombie/45;                
+                yawSector = (int)playerYaw/45;
+                
+                
+////////////////////////////////////////DETERMINE NODES TO LIGHT UP////////////////////
+                
+                //IF THE ZOMBIE IS WITHIN 1.5 blocks
+                if(distanceToZombie <= 2.0){
+                   
+                    switch(sector){
+                        case 0: p10 = 1;
+                            break;
+                        case 1: p11 = 1;
+                            break;
+                        case 2: p12 = 1;
+                            break;
+                        case 3: p13 = 1;
+                            break;
+                        case 4: p14 = 1;
+                            break;
+                        case 5: p15 = 1;
+                            break;
+                        case 6: p16 = 1;
+                            break;
+                        case 7: p17 = 1;
+                            break;
+                        default:
+                            break;
+                    }
+                 
+                }else{ //ZOMBIE IS OUTSIDE 1.5 blocks
+                    switch(sector){
+                        case 0: p20 = 1;
+                            break;
+                        case 1: p21 = 1;
+                            break;
+                        case 2: p22 = 1;
+                            break;
+                        case 3: p23 = 1;
+                            break;
+                        case 4: p24 = 1;
+                            break;
+                        case 5: p25 = 1;
+                            break;
+                        case 6: p26 = 1;
+                            break;
+                        case 7: p27 = 1;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+               
             }
-            System.out.println("Input array looks like: ["+directionOfZombie+", "+distanceToZombie+", "+damageTaken+", "+damageDealt+","+ playerYaw +","+bias+"]");
-
-            //passing in coordinates of the player, coordinates of the zombie, damagetaken, damagedealt
-           input = new float[]{directionOfZombie, distanceToZombie, damageTaken, damageDealt, (float)playerYaw, bias};           
-           
-           output = network.calculate(input);
+            
+          //DETERMINE WHAT SECTOR TO LIGHT UP FOR PLAYER YAW
+                switch(yawSector){
+                        case 0: y10 = 1;
+                            break;
+                        case 1: y11 = 1;
+                            break;
+                        case 2: y12 = 1;
+                            break;
+                        case 3: y13 = 1;
+                            break;
+                        case 4: y14 = 1;
+                            break;
+                        case 5: y15 = 1;
+                            break;
+                        case 6: y16 = 1;
+                            break;
+                        case 7: y17 = 1;
+                            break;
+                        default:
+                            break;
+                }
+               
+          input = new float[]{bias, damageTaken, damageDealt,p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27,y10,y11,y12,y13,y14,y15,y16,y17};
+          System.out.println("The input array: "+Arrays.toString(input));
+          output = network.calculate(input);
            
             
             
@@ -328,20 +471,19 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 if(output[i] > score){
                     
                     score = output[i];
-                    System.out.println("Score = " + score);
+                  //  System.out.println("Score = " + score);
                     selection = i;
-                    System.out.println("Selection = " + selection);
+                  //  System.out.println("Selection = " + selection);
                 }   
             }
+            
             //fix spot in map
-            selection += 7;
+            selection += 27;
             
             
             System.out.println(outputButtonNames.get(selection) + "\n");
             agent_host.sendCommand(outputButtonNames.get(selection));
-            
-            //System.out.println("The output node with the greatest value is: " + selection + " with a value of: " + output[selection]);
-            
+                        
             try {
                 Thread.sleep(1000);
             } catch(InterruptedException ex) {
@@ -364,6 +506,13 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         
         
+        
+        //COULD SLEEP HERE  ON NIGHT TIME IF NEED BE
+        
+        
+        
+        
+        
 ////////////////////////////////calculate  and return score ///////////////////////////////
         timeAlive = timeAlive - oldTimeAlive;
         oldTimeAlive = oldTimeAlive + timeAlive; 
@@ -378,8 +527,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         oldMobKilled = oldMobKilled + mobKilled;
         
         
-        
-        
+        System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
         return ((timeReward * timeAlive) + (damageDealtReward * damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * damageTaken));
     }

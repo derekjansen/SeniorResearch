@@ -21,15 +21,26 @@ public class TestWithCorrectNodes {
         //System.setOut(out);
                 
         
+        int degree = 46;
+        
+        int sector = degree/45;
+        
+        System.out.println("Sector = " + sector);
+        
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
         
         //make a new organism
         Organism organism = new Organism();
         
+        //bias
         int n1 = nodeInnovation.getInnovation();
+        //damage taken
         int n2 = nodeInnovation.getInnovation();
+        //damage dealt
         int n3 = nodeInnovation.getInnovation();
+        
+        //zombie location
         int n4 = nodeInnovation.getInnovation();
         int n5 = nodeInnovation.getInnovation();
         int n6 = nodeInnovation.getInnovation();
@@ -39,6 +50,31 @@ public class TestWithCorrectNodes {
         int n10 = nodeInnovation.getInnovation();
         int n11 = nodeInnovation.getInnovation();
         int n12 = nodeInnovation.getInnovation();
+        int n13 = nodeInnovation.getInnovation();
+        int n14 = nodeInnovation.getInnovation();
+        int n15 = nodeInnovation.getInnovation();
+        int n16 = nodeInnovation.getInnovation();
+        int n17 = nodeInnovation.getInnovation();
+        int n18 = nodeInnovation.getInnovation();
+        int n19 = nodeInnovation.getInnovation();
+        
+        //player looking direction
+        int n20 = nodeInnovation.getInnovation();
+        int n21 = nodeInnovation.getInnovation();
+        int n22 = nodeInnovation.getInnovation();
+        int n23 = nodeInnovation.getInnovation();
+        int n24 = nodeInnovation.getInnovation();
+        int n25 = nodeInnovation.getInnovation();
+        int n26 = nodeInnovation.getInnovation();
+        int n27 = nodeInnovation.getInnovation();
+        
+        //outputs
+        int n28 = nodeInnovation.getInnovation();
+        int n29 = nodeInnovation.getInnovation();
+        int n30 = nodeInnovation.getInnovation();
+        int n31 = nodeInnovation.getInnovation();
+        int n32 = nodeInnovation.getInnovation();
+        
         
         //number of input node is associated with the type of input       
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
@@ -47,21 +83,42 @@ public class TestWithCorrectNodes {
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n4));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n5));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n6));
-
-                
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n7));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n8));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n9));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n10));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n11));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n12));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n13));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n14));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n15));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n16));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n17));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n18));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n19));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n20));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n21));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n22));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n23));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n24));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n25));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n26));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n27));  
+        
+        
         //number of output node is associated with the "buttons" that can be pressed
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n8));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n9));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n10));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n11));
-        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n12));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n28));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n29));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n30));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n31));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n32));
         
         
         
         //create the base connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n6,n12,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n1,n32,0.5f,true,c1));
        
         
         
@@ -73,9 +130,8 @@ public class TestWithCorrectNodes {
             
             protected float evaluateOrganism(Organism organism){
                 
-              Random r = new Random();
-              float rand = r.nextFloat();
-              float[] input = {5.0f%rand, 4.0f%rand, -1.0f%rand, -2.0f%rand, 3.0f%rand, 1.0f};
+              
+              float[] input = {1f, 0.4f, 0.2f, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0};
               
               NeuralNetwork net = new NeuralNetwork(organism);
                // System.out.println("\nNew Organism");

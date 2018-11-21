@@ -1,9 +1,9 @@
 
 package seniorresearch;
 import com.microsoft.msr.malmo.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
 
@@ -34,7 +34,7 @@ public class TestingObservations implements XmlConversionMethods
         
          //run for 10 organisms
         double tempScore = 0;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 20; i++){
             System.out.println("Run Started for Organism: " + i);
             tempScore = runOrganism();
             System.out.println("The score for this organism: " + tempScore + "\n");
@@ -168,29 +168,100 @@ public class TestingObservations implements XmlConversionMethods
                 
             }
             
+            //zombie positions
+        float p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27;
+        //yaw values;
+        float y10,y11,y12,y13,y14,y15,y16,y17;
+        p10=p11=p12=p13=p14=p15=p16=p17=p20=p21=p22=p23=p24=p25=p26=p27=y10=y11=y12=y13=y14=y15=y16=y17= 0;
+        int yawSector =0;
+        
             if(pigX != 0){
                 double directionInDegrees = Math.toDegrees(Math.atan2((pigZ-zPos),(pigX-xPos)));
-               // if(directionInDegrees >= 0){
-               //     System.out.println("The direction of the pig is: right");
-               // }else{
-               //     System.out.println("The direction of the pig is: left");
-               // }
-                
-                 System.out.println("The direction of the pig is: " + directionInDegrees);
-                 System.out.println("The player yaw is: "+ yaw);
-                 
-                 
-                 
-                 
-                 //DIRECTIONINDEGREES DOES NOT GIVE TO TURN LEFT OR RIGHT. IT ONLY TELLS LOCATION OF CHARACTER
-                 //VERSUS THE PIG
-                 
-                 
-                 
+                directionInDegrees = (directionInDegrees+720) % 360;
+                int sector = (int)directionInDegrees/45;
+                System.out.println("The direction of the pig is: " + sector);
                 double distanceToPig = (float)Math.hypot((pigX-xPos), (pigZ-zPos));
                 System.out.println("The distance of the pig is: " + distanceToPig);
+                yawSector = (int)yaw/45;
+                System.out.println("The player yaw is: "+ yawSector);
+                 
+                 
+  
+                  if(distanceToPig <= 1.5){
+                   
+                    switch(sector){
+                        case 0: p10 = 1;
+                            break;
+                        case 1: p11 = 1;
+                            break;
+                        case 2: p12 = 1;
+                            break;
+                        case 3: p13 = 1;
+                            break;
+                        case 4: p14 = 1;
+                            break;
+                        case 5: p15 = 1;
+                            break;
+                        case 6: p16 = 1;
+                            break;
+                        case 7: p17 = 1;
+                            break;
+                        default:
+                            break;
+                    }
+                 
+                }else{ //ZOMBIE IS OUTSIDE 1.5 blocks
+                    switch(sector){
+                        case 0: p20 = 1;
+                            break;
+                        case 1: p21 = 1;
+                            break;
+                        case 2: p22 = 1;
+                            break;
+                        case 3: p23 = 1;
+                            break;
+                        case 4: p24 = 1;
+                            break;
+                        case 5: p25 = 1;
+                            break;
+                        case 6: p26 = 1;
+                            break;
+                        case 7: p27 = 1;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                
+                 
             }
             
+                  //DETERMINE WHAT SECTOR DIRECTION IS TO LIGHT UP
+                switch(yawSector){
+                        case 0: y10 = 1;
+                            break;
+                        case 1: y11 = 1;
+                            break;
+                        case 2: y12 = 1;
+                            break;
+                        case 3: y13 = 1;
+                            break;
+                        case 4: y14 = 1;
+                            break;
+                        case 5: y15 = 1;
+                            break;
+                        case 6: y16 = 1;
+                            break;
+                        case 7: y17 = 1;
+                            break;
+                        default:
+                            break;
+                }
+            
+            
+                float[] input = new float[]{p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27,y10,y11,y12,y13,y14,y15,y16,y17};
+              System.out.println(Arrays.toString(input) + "\n\n\n\n");
+                  
             
             ////////////randomized outputs to mimic button mashing///////////////
             agent_host.sendCommand( "turn 0");
@@ -210,7 +281,6 @@ public class TestingObservations implements XmlConversionMethods
                 System.err.println( "Error: " + error.getText() );
             }
               
-       
         
         } while(world_state.getIsMissionRunning() );
 
