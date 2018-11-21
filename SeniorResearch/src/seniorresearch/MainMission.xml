@@ -38,7 +38,7 @@
     <AgentSection>
         <Name>A default agent</Name>
         <AgentStart>
-            <Placement x="3" y="230" z="3" yaw="315"/>
+            <Placement x="3" y="230" z="3" yaw="270"/>
             <Inventory>
                 <InventoryItem slot="0" type="wooden_sword" />
         <!--       <InventoryItem slot="39" type="diamond_helmet" />
