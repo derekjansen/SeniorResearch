@@ -40,11 +40,11 @@
         <AgentStart>
             <Placement x="3" y="230" z="3" yaw="270"/>
             <Inventory>
-                <InventoryItem slot="0" type="wooden_sword" />
-        <!--       <InventoryItem slot="39" type="diamond_helmet" />
+    <!--            <InventoryItem slot="0" type="wooden_sword" />
+               <InventoryItem slot="39" type="diamond_helmet" />
                 <InventoryItem slot="38" type="diamond_chestplate" />
                 <InventoryItem slot="37" type="diamond_leggings" />
-                <InventoryItem slot="36" type="diamond_boots" />      -->  
+                <InventoryItem slot="36" type="diamond_boots" />      -->
             </Inventory>
         </AgentStart>
         <AgentHandlers>
@@ -61,7 +61,7 @@
                 <Width>640</Width>
                 <Height>480</Height>
             </VideoProducer>
-            
+            <MissionQuitCommands quitDescription="quit"/>
         </AgentHandlers>
     </AgentSection>
 </Mission>

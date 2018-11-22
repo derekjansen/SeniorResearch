@@ -19,13 +19,6 @@ public class TestWithCorrectNodes {
         
         //PrintStream out = new PrintStream(new FileOutputStream("testoutput.txt", true), true);
         //System.setOut(out);
-                
-        
-        int degree = 46;
-        
-        int sector = degree/45;
-        
-        System.out.println("Sector = " + sector);
         
         Counter nodeInnovation = new Counter();
         Counter connectionInnovation = new Counter();
@@ -134,10 +127,10 @@ public class TestWithCorrectNodes {
               float[] input = {1f, 0.4f, 0.2f, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0};
               
               NeuralNetwork net = new NeuralNetwork(organism);
-               // System.out.println("\nNew Organism");
+               System.out.println("\nNew Organism");
               
                 float output[]= net.calculate(input);
-               // System.out.println("\tOutput node 1= " + output[0] + "\n\tOutput node 2= " + output[1] + "\n\tOutput node 3= " + output[2]+ "\n\tOutput node 4= " + output[3]+ "\n\tOutput node 5= " + output[4]);
+               System.out.println("\tOutput node 1= " + output[0] + "\n\tOutput node 2= " + output[1] + "\n\tOutput node 3= " + output[2]+ "\n\tOutput node 4= " + output[3]+ "\n\tOutput node 5= " + output[4]);
               
               
               return organism.getConnectionGenes().values().size();

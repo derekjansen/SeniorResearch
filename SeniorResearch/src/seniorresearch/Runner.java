@@ -15,6 +15,7 @@ import neat.Organism;
 import neat.NodeGene;
 import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
+import test.OrganismPrinter;
 
 public class Runner implements XmlConversionMethods,FitnessTune
 {
@@ -22,8 +23,9 @@ public class Runner implements XmlConversionMethods,FitnessTune
     //hold node number and input/output actions
     static Map<Integer,String> outputButtonNames;
     static float oldMobKilled = 0;
-    static float oldDamageTaken = 0;
-    static float oldDamageDealt = 0;
+    static double oldDamageTaken = 0;
+    static double oldDamageDealt = 0;
+    static float oldTimeAlive = 0;
     
     static
     {        
@@ -175,13 +177,19 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         
         //run for 10 generations and print out scores and such
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 25; i++){
             
             eval.evaluate();
             
             System.out.print("Generation: " + i);
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
+            
+            if (i % 5 == 0) {
+                    OrganismPrinter printer = new OrganismPrinter();
+                    printer.showOrganism(eval.getMostFitOrganism(), "" + i);
+            }
+            
         }  
         
     }
@@ -201,17 +209,20 @@ public class Runner implements XmlConversionMethods,FitnessTune
         float output[]; 
         
         //other needed variables 
-        float life = 0;
+        double life = 0;
         double xPos = 0;
         double zPos = 0;
         float mobKilled = 0;
-        float damageTaken = 0;
-        float damageDealt = 0;
+        double damageTaken = 0;
+        double damageDealt = 0;
         float timeAlive = 0;
         float zombieXPos = -1;
         float zombieZPos = -1;
         double playerYaw = 0;
-        
+        float instantDamageTaken = 0;
+        float oldInstantDamageTaken = 0;
+        float instantDamageDealt = 0;
+        float oldInstantDamageDealt = 0;
         
 /////////////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
@@ -258,7 +269,6 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
 ///////////////////////////////////// MAIN LOOP ////////////////////////////////////////////////////////// 
         
-        float oldTimeAlive = 0;
         
         
         
@@ -292,7 +302,11 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         //reset to not seen each time
         zombieTrigger = false;
-        
+        //used for damage node
+        oldInstantDamageTaken = instantDamageTaken;
+        instantDamageTaken = 0;
+        oldInstantDamageDealt = instantDamageDealt;
+        instantDamageDealt = 0;
 ///////////////////////////GET OBSERVATIONS/////////////////////////////////
             
             if(world_state.getObservations().size() > 0){
@@ -300,18 +314,18 @@ public class Runner implements XmlConversionMethods,FitnessTune
                try{
                    
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
-                life = root.getInt("Life");
+                life = root.getDouble("Life");
                 xPos = root.getDouble("XPos");
                 zPos = root.getDouble("ZPos");
                 playerYaw = root.getDouble("Yaw");
                 mobKilled = root.getInt("MobsKilled");
                 damageTaken = root.getInt("DamageTaken");
                 damageDealt = root.getInt("DamageDealt");
-                
-                float test = root.getInt("TimeAlive");
-                
-                if(test > timeAlive){
-                    timeAlive = test;
+                instantDamageTaken = root.getInt("DamageTaken");
+                instantDamageDealt = root.getInt("DamageDealt");
+                //protects against dying
+                if(root.getInt("TimeAlive") != 0){
+                    timeAlive = root.getInt("TimeAlive");
                 }
                 
                 //there are nearby things AKA figure out where the zombie is
@@ -355,13 +369,16 @@ public class Runner implements XmlConversionMethods,FitnessTune
 ///////////////////////////plug in observations and send to neural net////////////////
             
             //SCALE DAMAGE THINGS TO 0-1
-            
-            
-            //normalizedDamageDealt =
-            //normalizedDamageTaken = 
-            
-           // HERE
-            
+            float damageTakenNode = 0f;
+            float damageDealtNode = 0f;
+            if(instantDamageTaken > oldInstantDamageTaken && oldInstantDamageTaken != 0){
+                //System.out.println("Player was hit");
+                damageTakenNode = 1;
+            }
+            if(instantDamageDealt > oldInstantDamageDealt && oldInstantDamageDealt != 0){
+                //System.out.println("Player was hit");
+                damageDealtNode = 1;
+            }
             
 
             
@@ -455,7 +472,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
                             break;
                 }
                
-          input = new float[]{bias, damageTaken, damageDealt,p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27,y10,y11,y12,y13,y14,y15,y16,y17};
+          input = new float[]{bias, damageTakenNode, damageDealtNode, p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27,y10,y11,y12,y13,y14,y15,y16,y17};
           System.out.println("The input array: "+Arrays.toString(input));
           output = network.calculate(input);
            
@@ -466,6 +483,22 @@ public class Runner implements XmlConversionMethods,FitnessTune
 ///////////////////////////Take output and select the action//////////////////////
             int selection = 0;
             float score = 0f;
+            
+            
+            
+            
+            //TAKE THIS CODE OUT, JUST A TEST THING
+            
+            if(output[0] == 0.5 || output[1] == 0.5)
+                agent_host.sendCommand("quit");
+            
+            if(output[2] == 0.5 || output[3] == 0.5)
+                agent_host.sendCommand("quit");    
+                
+                
+                
+                
+                
             for(int i = 0; i < 5; i++){
                 System.out.println("Output " + i + " = " + output[i]);
                 if(output[i] > score){
@@ -514,6 +547,13 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         
 ////////////////////////////////calculate  and return score ///////////////////////////////
+        
+        //player died
+        if(life == 0){
+            oldTimeAlive = 0;
+        }
+
+
         timeAlive = timeAlive - oldTimeAlive;
         oldTimeAlive = oldTimeAlive + timeAlive; 
          
@@ -521,7 +561,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         oldDamageDealt = oldDamageDealt + damageDealt;
         
         damageTaken = damageTaken - oldDamageTaken;
-        oldDamageTaken = oldDamageTaken +damageTaken;
+        oldDamageTaken = oldDamageTaken + damageTaken;
         
         mobKilled = mobKilled - oldMobKilled;
         oldMobKilled = oldMobKilled + mobKilled;
@@ -529,7 +569,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
-        return ((timeReward * timeAlive) + (damageDealtReward * damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * damageTaken));
+        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken));
     }
        
 }

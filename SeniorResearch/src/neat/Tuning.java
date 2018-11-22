@@ -14,8 +14,9 @@ public interface Tuning {
 	public final float DT = 10.0f;
 	public final float MUTATION_RATE = 0.8f;
 	public final float ADD_CONNECTION_RATE = 0.5f;
-	public final float ADD_NODE_RATE = 0.03f;
+                            //was 0.03
+	public final float ADD_NODE_RATE = 0.25f;
         
-        public final int populationSize = 25;
+        public final int populationSize = 15;
         
 }
