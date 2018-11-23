@@ -1,6 +1,8 @@
 package neat;
 
-public class NodeGene {
+import java.io.Serializable;
+
+public class NodeGene implements Serializable{
 	
 	public enum TYPE {
 		INPUT,

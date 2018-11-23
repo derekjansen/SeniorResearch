@@ -1,7 +1,6 @@
 package neat;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.Random;
 
 import neat.NodeGene.TYPE;
 
-public class Organism implements Utils{
+public class Organism implements Utils,Serializable{
 	
 	
 	private final float PROBABILITY_PERTURBING = 0.9f; // rest is probability of assigning new weight

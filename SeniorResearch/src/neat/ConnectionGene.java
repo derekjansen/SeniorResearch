@@ -1,6 +1,9 @@
 package neat;
 //
-public class ConnectionGene {
+
+import java.io.Serializable;
+
+public class ConnectionGene implements Serializable{
 	
 	private int inNode;
 	private int outNode;

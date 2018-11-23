@@ -1,10 +1,9 @@
 
 package seniorresearch;
 import com.microsoft.msr.malmo.*;
-import java.util.Arrays;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import neat.ConnectionGene;
@@ -16,6 +15,7 @@ import neat.NodeGene;
 import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
 import test.OrganismPrinter;
+import java.io.*;
 
 public class Runner implements XmlConversionMethods,FitnessTune
 {
@@ -26,6 +26,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
     static double oldDamageTaken = 0;
     static double oldDamageDealt = 0;
     static float oldTimeAlive = 0;
+    static int generation = 0;
     
     static
     {        
@@ -144,6 +145,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         //add these to the organism
         organism.addConnectionGene(new ConnectionGene(n1,n32,0.5f,true,c1));
         
+        
 ///////////////////////EVALUATOR////////////////////////////////////////////////////////
 
         //create evaluator and pass in the starting organism, and the counters for the two types of connections
@@ -155,6 +157,8 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 try{
                     //System.out.println("Run Next Organism");
                     //run the organism that is passed in and return a fitness score
+                    System.out.print(generation + ",");
+                    
                     float score = runOrganism(organism);
                     
                     System.out.println(score);
@@ -178,11 +182,13 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         //run for 100 generations and print out scores and such
         for(int i = 0; i < 100; i++){
-            System.out.print(i + ",");
+            
+            
             
             
             eval.evaluate();
             
+            generation++;
            
             //System.out.println(eval.getHighestFitness());
             
@@ -199,7 +205,14 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         
         //print out highest organism
-        
+        try{
+            FileOutputStream saveFile = new FileOutputStream("mostFitOrganism.sav");
+            ObjectOutputStream save = new ObjectOutputStream(saveFile);
+            save.writeObject(eval.getMostFitOrganism());
+            save.close();
+        }catch(Exception ex){
+            System.out.println("Couldnt save object " + ex);
+        }
         
         
     }
@@ -234,6 +247,8 @@ public class Runner implements XmlConversionMethods,FitnessTune
         float zombieXPos = -1;
         float zombieZPos = -1;
         double playerYaw = 0;
+        
+        
         float instantDamageTaken = 0;
         float oldInstantDamageTaken = 0;
         float instantDamageDealt = 0;
@@ -502,7 +517,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 }
                
           input = new float[]{bias, damageTakenNode, damageDealtNode, p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27,y10,y11,y12,y13,y14,y15,y16,y17};
-          System.out.println("The input array: "+Arrays.toString(input));
+          //System.out.println("The input array: "+Arrays.toString(input));
           output = network.calculate(input);
            
             
@@ -517,15 +532,15 @@ public class Runner implements XmlConversionMethods,FitnessTune
             //IF THE BOT HAS NO CONNECTION TO EITHER ANY KIND OF MOVE OR TURN, QUIT.
             //THE NETWORK NEEDS MORE MUTATIONS. ALL NEGATIVE SCORES TURN TO 0.01 ANYWAY.
             
-            if(output[0] == 0.5 || output[1] == 0.5)
-                agent_host.sendCommand("quit");
-            
-            if(output[2] == 0.5 || output[3] == 0.5)
-                agent_host.sendCommand("quit");    
+//            if(output[0] == 0.5 || output[1] == 0.5)
+//                agent_host.sendCommand("quit");
+//            
+//            if(output[2] == 0.5 || output[3] == 0.5)
+//                agent_host.sendCommand("quit");    
                 
                 
             for(int i = 0; i < 5; i++){
-                System.out.println("Output " + i + " = " + output[i]);
+                //System.out.println("Output " + i + " = " + output[i]);
                 if(output[i] > score){
                     
                     score = output[i];
@@ -539,7 +554,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
             selection += 27;
             
             
-            System.out.println(outputButtonNames.get(selection) + "\n");
+            //System.out.println(outputButtonNames.get(selection) + "\n");
             agent_host.sendCommand(outputButtonNames.get(selection));
                         
             try {
@@ -584,7 +599,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         oldMobKilled = oldMobKilled + mobKilled;
         
         System.out.print(timeAlive+","+damageDealt+","+damageTaken + ",");
-        //System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
+       //System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
         agent_host.sendCommand("quit");
         
