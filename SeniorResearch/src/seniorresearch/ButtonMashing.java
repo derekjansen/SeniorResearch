@@ -62,7 +62,7 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
     }
     
     static private float runOrganism() throws Exception{
-        
+        try{
          ///////////////////////////////////// SET UP THE WORLD AND THE MALMO AGENT /////////////////////////////////
         
         AgentHost agent_host = new AgentHost();
@@ -73,10 +73,16 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
       
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
         
-
+        
+        boolean success = true;
+        
+        while(success){
+            
         try {
             agent_host.startMission( my_mission, my_mission_record);
+            success = false;
         }
+        
         catch (MissionException e) {
             System.err.println( "Error starting mission: " + e.getMessage() );
             System.err.println( "Error code: " + e.getMissionErrorCode() );
@@ -86,9 +92,20 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
                 // Caused by lack of available Minecraft clients.
                 System.err.println( "Is there a Minecraft client running?");
             }
-            System.exit(1);
+            //return 0;
         }
 
+        
+        
+        }
+        
+        
+        
+        
+        
+        
+        
+        
         WorldState world_state;
 
         //System.out.print( "Waiting for the mission to start" );
@@ -239,13 +256,20 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
         oldMobKilled = oldMobKilled + mobKilled;
         
         System.out.print(timeAlive+","+damageDealt+","+damageTaken + ",");
-      // System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
-
+      //  System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
+        
+        agent_host.sendCommand("quit");
+      
         //calulate score here
         return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken));
-        
-        
-        
-    } 
+        }catch(Exception ex){   
+            
+            System.out.println("\n THERE WAS A BIG OL ERROR  \n");
+        return 0;
+        }
+    }
+    
+    
+
 }
 

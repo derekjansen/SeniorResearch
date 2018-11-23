@@ -147,10 +147,9 @@ public class TestWithCorrectNodes {
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
             if (i % 99 == 0) {
-                    OrganismPrinter printer = new OrganismPrinter();
-                    printer.showOrganism(eval.getMostFitOrganism(), "" + i);
+                  //  OrganismPrinter printer = new OrganismPrinter();
+                  //  printer.showOrganism(eval.getMostFitOrganism(), "" + i);
             }
-            
             
         }
     }

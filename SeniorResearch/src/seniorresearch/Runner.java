@@ -34,6 +34,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
     
     public static void main(String argv[]) throws Exception
     {
+        System.out.println("Generation Number,Time Alive,Damage Dealt,Damage Taken,Score");
 ///////////////////////////SET UP NEAT CODE/////////////////////
         
         //associate nodes with output
@@ -143,7 +144,8 @@ public class Runner implements XmlConversionMethods,FitnessTune
         //add these to the organism
         organism.addConnectionGene(new ConnectionGene(n1,n32,0.5f,true,c1));
         
-        
+///////////////////////EVALUATOR////////////////////////////////////////////////////////
+
         //create evaluator and pass in the starting organism, and the counters for the two types of connections
         Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
@@ -151,11 +153,11 @@ public class Runner implements XmlConversionMethods,FitnessTune
             protected float evaluateOrganism(Organism organism){
  
                 try{
-                    System.out.println("Run Next Organism");
+                    //System.out.println("Run Next Organism");
                     //run the organism that is passed in and return a fitness score
                     float score = runOrganism(organism);
                     
-                    System.out.println("The organism's score is: " + score);
+                    System.out.println(score);
                     
                     //if score is negative, we give it a very low score so that it is > 0
                     if(score < 0){
@@ -174,23 +176,31 @@ public class Runner implements XmlConversionMethods,FitnessTune
         };
         
         
-        
-        
-        //run for 10 generations and print out scores and such
-        for(int i = 0; i < 25; i++){
+        //run for 100 generations and print out scores and such
+        for(int i = 0; i < 100; i++){
+            System.out.print(i + ",");
+            
             
             eval.evaluate();
             
-            System.out.print("Generation: " + i);
-            System.out.print("\tHighest fitness: " + eval.getHighestFitness());
-            System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
+           
+            //System.out.println(eval.getHighestFitness());
             
-            if (i % 5 == 0) {
+            //System.out.print("Generation: " + i);
+            //System.out.print("\tHighest fitness: " + eval.getHighestFitness());
+            //System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
+            //print 
+            if (i % 5 == 0 || i == 99) {
                     OrganismPrinter printer = new OrganismPrinter();
                     printer.showOrganism(eval.getMostFitOrganism(), "" + i);
             }
             
         }  
+        
+        
+        //print out highest organism
+        
+        
         
     }
     
@@ -198,8 +208,13 @@ public class Runner implements XmlConversionMethods,FitnessTune
     
     
     
+    
+    
+    
+    
+    
     static private float runOrganism(Organism organism) throws Exception{
-        
+        try{
         //create the neural network that will run by passing in the organism 
         NeuralNetwork network = new NeuralNetwork(organism);
         
@@ -233,8 +248,16 @@ public class Runner implements XmlConversionMethods,FitnessTune
       
         MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
 
+        
+        
+        //BRUTE FORCE
+        
+        boolean success = true;
+        while(success){
+        
         try {
             agent_host.startMission( my_mission, my_mission_record);
+            success = false;
         }
         catch (MissionException e) {
             System.err.println( "Error starting mission: " + e.getMessage() );
@@ -245,14 +268,20 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 // Caused by lack of available Minecraft clients.
                 System.err.println( "Is there a Minecraft client running?");
             }
-            System.exit(1);
+            return 0;
         }
 
+        }
+        
+        
+        
+        
+        
         WorldState world_state;
 
-        System.out.print( "Waiting for the mission to start" );
+        //System.out.print( "Waiting for the mission to start" );
         do {
-            System.out.print( "." );
+            //System.out.print( "." );
             try {
                 Thread.sleep(100);
             } catch(InterruptedException ex) {
@@ -263,7 +292,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
             for( int i = 0; i < world_state.getErrors().size(); i++ )
                 System.err.println( "Error: " + world_state.getErrors().get(i).getText() );
         } while( !world_state.getIsMissionRunning() );
-        System.out.println( "" );
+        //System.out.println( "" );
 
        
         
@@ -310,7 +339,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
 ///////////////////////////GET OBSERVATIONS/////////////////////////////////
             
             if(world_state.getObservations().size() > 0){
-                System.out.println(world_state.getObservations().get(0).getText());
+                //System.out.println(world_state.getObservations().get(0).getText());
                try{
                    
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
@@ -485,18 +514,14 @@ public class Runner implements XmlConversionMethods,FitnessTune
             float score = 0f;
             
             
-            
-            
-            //TAKE THIS CODE OUT, JUST A TEST THING
+            //IF THE BOT HAS NO CONNECTION TO EITHER ANY KIND OF MOVE OR TURN, QUIT.
+            //THE NETWORK NEEDS MORE MUTATIONS. ALL NEGATIVE SCORES TURN TO 0.01 ANYWAY.
             
             if(output[0] == 0.5 || output[1] == 0.5)
                 agent_host.sendCommand("quit");
             
             if(output[2] == 0.5 || output[3] == 0.5)
                 agent_host.sendCommand("quit");    
-                
-                
-                
                 
                 
             for(int i = 0; i < 5; i++){
@@ -510,7 +535,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 }   
             }
             
-            //fix spot in map
+            //fix spot in move MAP
             selection += 27;
             
             
@@ -534,17 +559,9 @@ public class Runner implements XmlConversionMethods,FitnessTune
             
         } while(world_state.getIsMissionRunning() );
 
-        System.out.println( "Mission has stopped." );
+        //System.out.println( "Mission has stopped." );
         
-        
-        
-        
-        
-        //COULD SLEEP HERE  ON NIGHT TIME IF NEED BE
-        
-        
-        
-        
+   
         
 ////////////////////////////////calculate  and return score ///////////////////////////////
         
@@ -566,10 +583,18 @@ public class Runner implements XmlConversionMethods,FitnessTune
         mobKilled = mobKilled - oldMobKilled;
         oldMobKilled = oldMobKilled + mobKilled;
         
+        System.out.print(timeAlive+","+damageDealt+","+damageTaken + ",");
+        //System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
-        System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
+        agent_host.sendCommand("quit");
         
+        //calculate score here
         return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken));
+        }catch(Exception ex){   
+            
+            System.out.println("\n THERE WAS A BIG OL ERROR  \n");
+        return 0;
+        }
     }
        
 }

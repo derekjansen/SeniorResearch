@@ -17,7 +17,8 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
     static float oldMobKilled = 0;
     static float oldDamageTaken = 0;
     static float oldDamageDealt = 0;
-
+    static float oldTimeAlive = 0;
+    
     static
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
@@ -107,7 +108,7 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
        
             double xPos = 0;
             double zPos = 0;
-            //double life = 0;
+            double life = 0;
             float mobKilled = 0;
             float damageTaken = 0;
             float damageDealt = 0;
@@ -116,7 +117,7 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
             Double zombieZPos = null;
             
             
-            float oldTimeAlive = 0;
+            
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         
         //pause on daylight for a bit
@@ -143,15 +144,17 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
             //    System.out.println(world_state.getObservations().get(0).getText());
                
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
-               // life = root.getDouble("Life");
+                life = root.getDouble("Life");
                 xPos = root.getDouble("XPos");
                 zPos = root.getDouble("ZPos");
                 mobKilled = root.getInt("MobsKilled");
                 damageTaken = root.getInt("DamageTaken");
                 damageDealt = root.getInt("DamageDealt");
+                
                 if(root.getInt("TimeAlive") != 0){
                     timeAlive = root.getInt("TimeAlive");
                 }
+                
                 //there are nearby things AKA figure out where the zombie is
                 if(root.has("Entities")){
                     //get array
@@ -250,8 +253,14 @@ public class RuledBased implements XmlConversionMethods,FitnessTune
         
         System.out.println( "Mission has stopped." );
        
+        
+        //player died
+        if(life == 0){
+            oldTimeAlive = 0;
+        }
+        
         //get correct run scores since the stats for the organism persists between runs
-         timeAlive = timeAlive - oldTimeAlive;
+        timeAlive = timeAlive - oldTimeAlive;
         oldTimeAlive = oldTimeAlive + timeAlive; 
           
         damageDealt = damageDealt - oldDamageDealt;
