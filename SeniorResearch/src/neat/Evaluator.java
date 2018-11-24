@@ -1,5 +1,6 @@
 package neat;
 //
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public abstract class Evaluator implements Tuning{
+public abstract class Evaluator implements Tuning,Serializable{
 	
 	private FitnessOrganismComparator fitComp = new FitnessOrganismComparator();
 	
@@ -251,7 +252,7 @@ public abstract class Evaluator implements Tuning{
         
 	protected abstract float evaluateOrganism(Organism organism);
 	
-	public class FitnessOrganism {
+	public class FitnessOrganism implements Serializable {
 		
 		float fitness;
 		Organism organism;
@@ -264,7 +265,7 @@ public abstract class Evaluator implements Tuning{
 	
 	
 	
-	public class FitnessOrganismComparator implements Comparator<FitnessOrganism> {
+	public class FitnessOrganismComparator implements Comparator<FitnessOrganism>,Serializable {
 
 		@Override
 		public int compare(FitnessOrganism one, FitnessOrganism two) {

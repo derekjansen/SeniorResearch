@@ -1,5 +1,6 @@
 package neat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.Random;
 import neat.Evaluator;
 import neat.Organism;
 
-public class Species {
+public class Species implements Serializable{
 		
 		public Organism mascot;
 		public List<Organism> members;
