@@ -265,14 +265,23 @@ public class Runner implements XmlConversionMethods,FitnessTune
 
         
         
+    //ADDED TO ATTEMPT TO SPECIFY THE PORT TO CONNECT TO AND NOT LOST PORT CONNECTION
+        ClientPool pool = new ClientPool();
+        ClientInfo client = new ClientInfo("127.0.0.1",10001);
+        pool.add(client);
+       
+        
+        
+        
         //BRUTE FORCE
         
-        boolean success = true;
-        while(success){
-        
+       boolean noSuccess;
+       do{
+           
+           noSuccess = false;
         try {
-            agent_host.startMission( my_mission, my_mission_record);
-            success = false;
+            //unsure what the 0 and "" are for.. the "" says experiment ID in documentation
+            agent_host.startMission( my_mission, pool, my_mission_record, 0, ""); 
         }
         catch (MissionException e) {
             System.err.println( "Error starting mission: " + e.getMessage() );
@@ -283,10 +292,14 @@ public class Runner implements XmlConversionMethods,FitnessTune
                 // Caused by lack of available Minecraft clients.
                 System.err.println( "Is there a Minecraft client running?");
             }
-            return 0;
+            //System.exit(0);
+            
+            //didnt work, loop again.
+            noSuccess = true;
+            
         }
 
-        }
+        }while(noSuccess);
         
         
         
@@ -307,7 +320,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
             for( int i = 0; i < world_state.getErrors().size(); i++ )
                 System.err.println( "Error: " + world_state.getErrors().get(i).getText() );
         } while( !world_state.getIsMissionRunning() );
-        //System.out.println( "" );
+        
 
        
         
@@ -316,17 +329,7 @@ public class Runner implements XmlConversionMethods,FitnessTune
         
         
         
-        //pause on daylight for a bit
-        try {
-                Thread.sleep(20000);
-            } catch(InterruptedException ex) {
-                System.err.println( "User interrupted while mission was running." );
-                return 0;
-            }
-        agent_host.sendCommand("chat /tp 4 228 4");
-        //turn to night
-        agent_host.sendCommand("chat /time set 15000");
-        //Spawn zombie in the corner
+      
         agent_host.sendCommand("chat /summon zombie 11 228 11 {IsBaby:0}");
         
         
@@ -602,6 +605,9 @@ public class Runner implements XmlConversionMethods,FitnessTune
        //System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
         agent_host.sendCommand("quit");
+        //agent_host.killClient(client);
+        
+        
         
         //calculate score here
         return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken));

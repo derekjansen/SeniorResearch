@@ -124,7 +124,7 @@ public class TestWithCorrectNodes {
             protected float evaluateOrganism(Organism organism){
                 
               
-              float[] input = {1f, 0.4f, 0.2f, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0};
+              float[] input = {1, 0, 1, 0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0};
               
               NeuralNetwork net = new NeuralNetwork(organism);
                System.out.println("\nNew Organism");
