@@ -22,13 +22,20 @@ public abstract class Evaluator implements Tuning,Serializable{
 	
 	
 	private List<Organism> organisms;
-	private List<FitnessOrganism> fitnessOrganisms;
-	private List<Organism> nextGenOrganisms;
+	
+
 	
 	private List<Species> species;
 	
-	private Map<Organism, Species> mappedSpecies;
-	private Map<Organism, Float> scoreMap;
+        
+        //these were instatiated in the evaluate method
+        private List<FitnessOrganism> fitnessOrganisms = new LinkedList<FitnessOrganism>();
+        private List<Organism> nextGenOrganisms = new LinkedList<Organism>();
+	private Map<Organism, Species> mappedSpecies = new HashMap<Organism, Species>();
+	private Map<Organism, Float> scoreMap = new HashMap<Organism, Float>();
+        
+        
+        
 	private float highestScore;
 	private int stagnation = 0;
 	private Organism mostFitOrganism;
@@ -54,11 +61,16 @@ public abstract class Evaluator implements Tuning,Serializable{
 		for (Species s : species) {
 			s.reset(random);
 		}
-		scoreMap = new HashMap<Organism, Float>();
-		mappedSpecies = new HashMap<Organism, Species>();
-		nextGenOrganisms = new LinkedList<Organism>();
-		fitnessOrganisms = new LinkedList<FitnessOrganism>();
 		
+
+                //try just clearing these instead.
+                scoreMap.clear();
+                mappedSpecies.clear();
+                nextGenOrganisms.clear();
+                fitnessOrganisms.clear();
+
+
+
 		// Place organisms into species
 		int added = 0;
 		for (Organism g : organisms) {

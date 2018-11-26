@@ -124,7 +124,7 @@ public class TestWithCorrectNodes {
             protected float evaluateOrganism(Organism organism){
                 
               
-              float[] input = {1, 0, 1, 0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0};
+              float[] input = {1, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0};
               
               NeuralNetwork net = new NeuralNetwork(organism);
                System.out.println("\nNew Organism");
@@ -147,8 +147,8 @@ public class TestWithCorrectNodes {
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
             if (i % 99 == 0) {
-                  //  OrganismPrinter printer = new OrganismPrinter();
-                  //  printer.showOrganism(eval.getMostFitOrganism(), "" + i);
+                    OrganismPrinter printer = new OrganismPrinter();
+                    printer.showOrganism(eval.getMostFitOrganism(), "" + i);
             }
             
         }

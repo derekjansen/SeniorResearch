@@ -26,17 +26,29 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
     static double oldDamageTaken = 0;
     static double oldDamageDealt = 0;
     static float oldTimeAlive = 0;
-    static int generation = 8;
+    static int generation = 0;
     static
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
     }
     
+    static MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
+    static AgentHost agent_host = new AgentHost();
+    static String missionXmlString = createMissionString(0);
+    static MissionSpec my_mission;
+    
+    
+    
     public static void main(String argv[]) throws Exception
     {
-        System.out.println("Generation Number,Time Alive,Damage Dealt,Damage Taken,Score");
-///////////////////////////SET UP NEAT CODE/////////////////////
         
+        my_mission = new MissionSpec(missionXmlString, true);
+
+        System.out.println("Generation Number,Time Alive,Damage Dealt,Damage Taken,Score,NodeGenes,ConnectionGenes");
+
+
+///////////////////////////SET UP NEAT CODE/////////////////////
+
         //associate nodes with output
         outputButtonNames = new HashMap();
         
@@ -130,18 +142,14 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n31));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n32));
         
-        
-        
+
         outputButtonNames.put(n28,"move 1");
         outputButtonNames.put(n29,"move -1");
         outputButtonNames.put(n30,"turn 1");
         outputButtonNames.put(n31,"turn -1");
         outputButtonNames.put(n32,"attack 1");
         
-       
-        
-        
-        
+
         //create the base bias connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
@@ -149,21 +157,16 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
         
         
-        
-        
-        
-        
-        
         ///LOAD ORGANISM////
         
         
-        FileInputStream openFile = new FileInputStream("mostFitOrganism7.sav");
-        ObjectInputStream openRestore = new ObjectInputStream(openFile);
-        Organism savedOrganism = (Organism)openRestore.readObject();
-        openRestore.close();
-        
-        connectionInnovation.setInnocation(savedOrganism.getConnectionGenes().keySet().size());
-        nodeInnovation.setInnocation(savedOrganism.getNodeGenes().keySet().size());
+//        FileInputStream openFile = new FileInputStream("mostFitOrganism24.sav");
+//        ObjectInputStream openRestore = new ObjectInputStream(openFile);
+//        Organism savedOrganism = (Organism)openRestore.readObject();
+//        openRestore.close();
+//        
+//        connectionInnovation.setInnocation(savedOrganism.getConnectionGenes().keySet().size());
+//        nodeInnovation.setInnocation(savedOrganism.getNodeGenes().keySet().size());
         
         
         
@@ -175,7 +178,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
 ///////////////////////EVALUATOR////////////////////////////////////////////////////////
    
         //create evaluator and pass in the starting organism, and the counters for the two types of connections
-        Evaluator eval = new Evaluator(savedOrganism, nodeInnovation, connectionInnovation){
+        Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
             @Override
             
             protected float evaluateOrganism(Organism organism){
@@ -188,22 +191,21 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                     System.out.print(generation + ",");
                     
                     float score = runOrganism(organism);
+                   
                     
-                    System.out.println(score);
+                    System.out.print(score + ",");
+                    System.out.print(organism.getNodeGenes().size() + ",");
+                    
+                    System.out.println(organism.getConnectionGenes().size());
+                    
                     
                     //if score is negative, we give it a very low score so that it is > 0
                     if(score < 0){
-                        score = 0.01f;
+                        score = 1f;
                     }
                     
-                    
-                    
-    //FOR TRYING TO GET THE ORGANISMS CONNECTED  
-                    //System.out.println(organism.getConnectionGenes().values().size());
-                    return organism.getConnectionGenes().values().size();
-                   
 
-                     //return score;
+                     return score;
                        
                 } catch (Exception ex) {
                     Logger.getLogger(Runner.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,20 +216,12 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             }
         };
         
-    
-        // attempt to load the evaluator
-//        FileInputStream openFile = new FileInputStream("mostFitOrganism0.sav");
-//        ObjectInputStream openRestore = new ObjectInputStream(openFile);
-//        Evaluator eval = (Evaluator)openRestore.readObject();
-//        openRestore.close();
-     
-    
      
      
      
      
         //run for 100 generations and print out scores and such
-        for(int i = 8; i < 16; i++){
+        for(int i = 0; i < 100; i++){
 
             eval.evaluate();
             
@@ -237,11 +231,8 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             
             OrganismPrinter printer = new OrganismPrinter();
             printer.showOrganism(eval.getMostFitOrganism(), "" + i);
-         
-                    
-                    
-                    
-                    
+            
+            
                   //save organism or evaluator per whatever generation
             try{
                 FileOutputStream saveFile = new FileOutputStream("mostFitOrganism"+ i  + ".sav");
@@ -251,14 +242,8 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                 System.out.println("Saved Eval");
             }catch(Exception ex){
                 System.out.println("Couldnt save object " + ex);
-            }  
-                    
-                    
-            
-            
+            }   
         }  
-        
-        
     }
     
     
@@ -300,21 +285,16 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
 /////////////////////////////////////////// SET UP THE WOLRD AND THE MALMO AGENT /////////////////////////////////
         
-        AgentHost agent_host = new AgentHost();
         
-        String missionXmlString = createMissionString(0);
-        MissionSpec my_mission = new MissionSpec(missionXmlString, true);
       
-        MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
+        
 
         
         
     //ADDED TO ATTEMPT TO SPECIFY THE PORT TO CONNECT TO AND NOT LOST PORT CONNECTION
-        ClientPool pool = new ClientPool();
-        ClientInfo client = new ClientInfo("127.0.0.1",10001);
-        pool.add(client);
-       
         
+       
+//        client.setCommandPort();
         
         
         //BRUTE FORCE
@@ -324,8 +304,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
            
            noSuccess = false;
         try {
-            //unsure what the 0 and "" are for.. the "" says experiment ID in documentation
-            agent_host.startMission( my_mission, pool, my_mission_record, 0, ""); 
+            agent_host.startMission( my_mission, my_mission_record); 
         }
         catch (MissionException e) {
             System.err.println( "Error starting mission: " + e.getMessage() );
@@ -430,14 +409,8 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                         if(theEntity.getString("name").equalsIgnoreCase("Zombie")){
                             //zombie was found
                             zombieTrigger = true;
-                            //the entity is the zombie here.
-                        //    System.out.println("zombie found");
-                        //    System.out.println(theEntity);
                             zombieXPos = (float)theEntity.getDouble("x");
-                            zombieZPos = (float)theEntity.getDouble("z");
-                        //    System.out.println("The zombies' lifepoints are: " + theEntity.getInt("life"));
-                        //    System.out.println("The zombies coordinates are: " + theEntity.getDouble("x") + " , " + theEntity.getDouble("z"));
-   
+                            zombieZPos = (float)theEntity.getDouble("z");                  
                         }
                         
                         i--;
@@ -574,10 +547,9 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             int selection = 0;
             float score = 0f;
             
-            
+            //Doesnt work with scoring
             //IF THE BOT HAS NO CONNECTION TO EITHER ANY KIND OF MOVE OR TURN, QUIT.
             //THE NETWORK NEEDS MORE MUTATIONS. ALL NEGATIVE SCORES TURN TO 0.01 ANYWAY.
-            
 //            if((output[0] == 0.5 && output[1] == 0.5) || (output[2] == 0.5 && output[3] == 0.5)  ){
 //                agent_host.sendCommand("quit");
 //            }
@@ -585,20 +557,23 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                 
                 
             for(int i = 0; i < 5; i++){
-               //System.out.println("Output " + i + " = " + output[i]);
+              // System.out.println("Output " + i + " = " + output[i]);
                 if(output[i] > score){
                     
                     score = output[i];
-                 //   System.out.println("Score = " + score);
+                    
                     selection = i;
-                 //   System.out.println("Selection = " + selection);
+                    
                 }   
             }
+            
+            
             
             //fix spot in move MAP
             selection += 27;
             
-            
+            //show what it is picking
+            //System.out.println(outputButtonNames.get(selection));
             //System.out.println(outputButtonNames.get(selection) + "\n");
             agent_host.sendCommand(outputButtonNames.get(selection));
                         
@@ -649,12 +624,14 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
        //System.out.println("\nORGANISM STATS: TimeAlive: " + timeAlive + ", DamageDealt: " + damageDealt + ", damageTaken: " + damageTaken + ", mobKilled: " + mobKilled);
         
         agent_host.sendCommand("quit");
-        //agent_host.killClient(client);
+        
+        
+        
         
         
         
         //calculate score here
-        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken));
+        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken) + fitnessBias);
         
         
         }catch(Exception ex){   

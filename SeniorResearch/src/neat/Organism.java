@@ -46,7 +46,7 @@ public class Organism implements Utils,Serializable{
 	public Map<Integer, ConnectionGene> getConnectionGenes() {
 		return connections;
 	}
-	
+	        
 	public Map<Integer, NodeGene> getNodeGenes() {
 		return nodes;
 	}
