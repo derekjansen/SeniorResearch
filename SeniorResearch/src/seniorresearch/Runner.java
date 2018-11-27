@@ -15,6 +15,7 @@ import neat.NodeGene;
 import org.json.*;
 import static seniorresearch.XmlConversionMethods.createMissionString;
 import java.io.*;
+import java.util.Arrays;
 import test.OrganismPrinter;
 
 public class Runner implements XmlConversionMethods,FitnessTune,Serializable
@@ -44,7 +45,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
         my_mission = new MissionSpec(missionXmlString, true);
 
-        System.out.println("Generation Number,Time Alive,Damage Dealt,Damage Taken,Score,NodeGenes,ConnectionGenes");
+        System.out.println("Generation Number,Time Alive,Damage Dealt,Damage Taken,Score,NodeGenes,ConnectionGenes,Species");
 
 
 ///////////////////////////SET UP NEAT CODE/////////////////////
@@ -104,6 +105,16 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         int n31 = nodeInnovation.getInnovation();
         int n32 = nodeInnovation.getInnovation();
         
+        //wall spots
+        int n33 = nodeInnovation.getInnovation();
+        int n34 = nodeInnovation.getInnovation();
+        int n35 = nodeInnovation.getInnovation();
+        int n36 = nodeInnovation.getInnovation();
+        int n37 = nodeInnovation.getInnovation();
+        int n38 = nodeInnovation.getInnovation();
+        int n39 = nodeInnovation.getInnovation();
+        int n40 = nodeInnovation.getInnovation();
+        int n41 = nodeInnovation.getInnovation();
         
         //number of input node is associated with the type of input       
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
@@ -133,7 +144,15 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n25));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n26));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n27));  
-        
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n33));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n34));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n35));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n36));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n37));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n38));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n39));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n40));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n41)); 
         
         //number of output node is associated with the "buttons" that can be pressed
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n28));
@@ -141,6 +160,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n30));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n31));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n32));
+        
         
 
         outputButtonNames.put(n28,"move 1");
@@ -153,14 +173,14 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         //create the base bias connection between one and one
         int c1 = connectionInnovation.getInnovation();
         //add these to the organism
-        organism.addConnectionGene(new ConnectionGene(n1,n32,0.5f,true,c1));
+        organism.addConnectionGene(new ConnectionGene(n1,n28,0.5f,true,c1));
         
         
         
         ///LOAD ORGANISM////
         
-        
-//        FileInputStream openFile = new FileInputStream("mostFitOrganism24.sav");
+//        
+//        FileInputStream openFile = new FileInputStream("mostFitOrganism61.sav");
 //        ObjectInputStream openRestore = new ObjectInputStream(openFile);
 //        Organism savedOrganism = (Organism)openRestore.readObject();
 //        openRestore.close();
@@ -196,8 +216,8 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                     System.out.print(score + ",");
                     System.out.print(organism.getNodeGenes().size() + ",");
                     
-                    System.out.println(organism.getConnectionGenes().size());
-                    
+                    System.out.print(organism.getConnectionGenes().size() + ",");
+                    System.out.println(this.getSpeciesAmount());
                     
                     //if score is negative, we give it a very low score so that it is > 0
                     if(score < 0){
@@ -220,8 +240,8 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
      
      
      
-        //run for 100 generations and print out scores and such
-        for(int i = 0; i < 100; i++){
+        //run for 200 generations and print out scores and such
+        for(int i = 0; i < 200; i++){
 
             eval.evaluate();
             
@@ -308,12 +328,12 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         }
         catch (MissionException e) {
             System.err.println( "Error starting mission: " + e.getMessage() );
-            System.err.println( "Error code: " + e.getMissionErrorCode() );
+            //System.err.println( "Error code: " + e.getMissionErrorCode() );
             // We can use the code to do specific error handling, eg:
             if (e.getMissionErrorCode() == MissionException.MissionErrorCode.MISSION_INSUFFICIENT_CLIENTS_AVAILABLE)
             {
                 // Caused by lack of available Minecraft clients.
-                System.err.println( "Is there a Minecraft client running?");
+            //    System.err.println( "Is there a Minecraft client running?");
             }
             //System.exit(0);
             
@@ -365,9 +385,19 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         float p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27;
         //yaw values;
         float y10,y11,y12,y13,y14,y15,y16,y17;
-
+        //wall locations;
+        int floor[] = new int[9]; 
         
     do {
+        agent_host.sendCommand("move 0");
+        agent_host.sendCommand("turn 0");
+        try {
+                Thread.sleep(100);
+        } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return 0;
+        }
+        
         
         //reset to not seen each time
         zombieTrigger = false;
@@ -379,7 +409,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
 ///////////////////////////GET OBSERVATIONS/////////////////////////////////
             
             if(world_state.getObservations().size() > 0){
-                //System.out.println(world_state.getObservations().get(0).getText());
+               // System.out.println(world_state.getObservations().get(0).getText());
                try{
                    
                 JSONObject root =  new JSONObject(world_state.getObservations().get(0).getText()); 
@@ -418,6 +448,17 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                     
                 }
                 
+                if(root.has("floor")){
+                   JSONArray theFloorArray = root.getJSONArray("floor"); 
+                   for(int r=0; r<9; r++){
+                       if(theFloorArray.getString(r).equalsIgnoreCase("stone")){
+                           floor[r] = 1;
+                       }else{
+                           floor[r] = 0;   
+                       } 
+                   }                   
+                }
+                  
                 //System.out.println("Life: " + life + ", timeAlive: " + timeAlive + ", XPos: " + xPos + ", ZPos: " + zPos + ", damageTaken: " + damageTaken + ", damageDealt: " + damageDealt + ", mobKilled: " + mobKilled + "\n"); 
                }catch(Exception ex){
                    
@@ -447,7 +488,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             
             float directionOfZombie = -1;
             float distanceToZombie = -1;
-            p10=p11=p12=p13=p14=p15=p16=p17=p20=p21=p22=p23=p24=p25=p26=p27=y10=y11=y12=y13=y14=y15=y16=y17= 0;
+            p10=p11=p12=p13=p14=p15=p16=p17=p20=p21=p22=p23=p24=p25=p26=p27=y10=y11=y12=y13=y14=y15=y16=y17=0;
             int sector,yawSector = 0;
            
             //if a zombie was found, figure out direction and distance
@@ -534,8 +575,11 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                         default:
                             break;
                 }
+                    
+                
+                
                
-          input = new float[]{bias, damageTakenNode, damageDealtNode, p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27,y10,y11,y12,y13,y14,y15,y16,y17};
+          input = new float[]{bias, damageTakenNode, damageDealtNode, p10,p11,p12,p13,p14,p15,p16,p17,p20,p21,p22,p23,p24,p25,p26,p27,y10,y11,y12,y13,y14,y15,y16,y17,floor[0],floor[1],floor[2],floor[3],floor[4],floor[5],floor[6],floor[7],floor[8]};
           //System.out.println("The input array: "+Arrays.toString(input));
           output = network.calculate(input);
            
@@ -557,7 +601,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                 
                 
             for(int i = 0; i < 5; i++){
-              // System.out.println("Output " + i + " = " + output[i]);
+               //System.out.println("Output " + i + " = " + output[i]);
                 if(output[i] > score){
                     
                     score = output[i];
@@ -600,11 +644,12 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
 ////////////////////////////////calculate  and return score ///////////////////////////////
         
-
+        int playerIsDead = 0;
 
         //player died
         if(life == 0){
             oldTimeAlive = 0;
+            playerIsDead = 1;
         }
 
 
@@ -631,7 +676,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
         
         //calculate score here
-        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken) + fitnessBias);
+        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken) + (float)(playerIsDead*playerDied) + fitnessBias);
         
         
         }catch(Exception ex){   

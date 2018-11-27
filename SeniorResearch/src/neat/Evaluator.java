@@ -55,6 +55,11 @@ public abstract class Evaluator implements Tuning,Serializable{
 	 * Runs one generation
 	 */
 	public void evaluate() {
+            
+                //reset most fit organism so it finds the most fit per generation
+                highestScore = 0;
+                mostFitOrganism = null;
+            
 		stagnation++;
 		
 		// Reset everything for next generation
@@ -187,6 +192,7 @@ public abstract class Evaluator implements Tuning,Serializable{
 		}
 		
 		organisms = nextGenOrganisms;
+                nextGenOrganisms = null;
 		nextGenOrganisms = new ArrayList<Organism>();
 	}
 	

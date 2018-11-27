@@ -68,6 +68,16 @@ public class TestWithCorrectNodes {
         int n31 = nodeInnovation.getInnovation();
         int n32 = nodeInnovation.getInnovation();
         
+        //floor
+         int n33 = nodeInnovation.getInnovation();
+        int n34 = nodeInnovation.getInnovation();
+        int n35 = nodeInnovation.getInnovation();
+        int n36 = nodeInnovation.getInnovation();
+        int n37 = nodeInnovation.getInnovation();
+        int n38 = nodeInnovation.getInnovation();
+        int n39 = nodeInnovation.getInnovation();
+        int n40 = nodeInnovation.getInnovation();
+        int n41 = nodeInnovation.getInnovation();
         
         //number of input node is associated with the type of input       
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n1));
@@ -97,7 +107,15 @@ public class TestWithCorrectNodes {
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n25));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n26));
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n27));  
-        
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n33));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n34));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n35));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n36));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n37));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n38));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n39));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n40));
+        organism.addNodeGene(new NodeGene(NodeGene.TYPE.INPUT,n41)); 
         
         //number of output node is associated with the "buttons" that can be pressed
         organism.addNodeGene(new NodeGene(NodeGene.TYPE.OUTPUT,n28));
@@ -124,7 +142,7 @@ public class TestWithCorrectNodes {
             protected float evaluateOrganism(Organism organism){
                 
               
-              float[] input = {1, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0};
+              float[] input = {1, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,1,1,0,0,0,0,0,0};
               
               NeuralNetwork net = new NeuralNetwork(organism);
                System.out.println("\nNew Organism");
@@ -146,7 +164,7 @@ public class TestWithCorrectNodes {
             System.out.print("Generation: " + i);
             System.out.print("\tHighest fitness: " + eval.getHighestFitness());
             System.out.print("\tAmount of species: " + eval.getSpeciesAmount() + "\n");
-            if (i % 99 == 0) {
+            if (i % 10 == 0 || i == 99) {
                     OrganismPrinter printer = new OrganismPrinter();
                     printer.showOrganism(eval.getMostFitOrganism(), "" + i);
             }

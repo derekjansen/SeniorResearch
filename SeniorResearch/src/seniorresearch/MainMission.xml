@@ -35,7 +35,7 @@
     <AgentSection>
         <Name>A default agent</Name>
         <AgentStart>
-            <Placement x="4" y="228" z="4" yaw="270"/>
+            <Placement x="6" y="228" z="4" yaw="0"/>
             <Inventory>
                 <InventoryItem slot="0" type="wooden_sword" />
             <!--   <InventoryItem slot="39" type="diamond_helmet" />
@@ -47,7 +47,12 @@
         <AgentHandlers>
             <ChatCommands/>
             <ContinuousMovementCommands/>
-            
+            <ObservationFromGrid>
+                      <Grid name="floor">
+                        <min x="-1" y="0" z="-1"/>
+                        <max x="1" y="0" z="1"/> 
+                      </Grid>
+            </ObservationFromGrid>
             <ObservationFromNearbyEntities>
                 <Range name="Entities" xrange="8" yrange="2" zrange="8" />
             </ObservationFromNearbyEntities>
