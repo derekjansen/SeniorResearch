@@ -224,8 +224,13 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                         score = 1f;
                     }
                     
+                    //promote network growth for beginning networks
+                    if(generation < 20){
+                        return organism.getConnectionGenes().size();
+                    }
 
-                     return score;
+                    //then begin normal scoring.
+                    return score;
                        
                 } catch (Exception ex) {
                     Logger.getLogger(Runner.class.getName()).log(Level.SEVERE, null, ex);
@@ -241,7 +246,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
      
      
         //run for 200 generations and print out scores and such
-        for(int i = 0; i < 200; i++){
+        for(int i = 0; i < 150; i++){
 
             eval.evaluate();
             
@@ -387,7 +392,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         float y10,y11,y12,y13,y14,y15,y16,y17;
         //wall locations;
         int floor[] = new int[9]; 
-        
+        boolean justDied = false;
     do {
         agent_host.sendCommand("move 0");
         agent_host.sendCommand("turn 0");
@@ -644,18 +649,30 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
 ////////////////////////////////calculate  and return score ///////////////////////////////
         
-        int playerIsDead = 0;
+       int playerIsDead = 0;
+System.out.println("\noldtime " + oldTimeAlive + " life " + life + " time alive " + timeAlive);
+       
+//        //player died
 
-        //player died
-        if(life == 0){
-            oldTimeAlive = 0;
+        if(life == 0 && oldTimeAlive < 1000){
+            oldTimeAlive = 0; //reset
             playerIsDead = 1;
+        }else if(life == 0){
+            timeAlive = Math.abs(oldTimeAlive - timeAlive);
+            oldTimeAlive = 0; //reset
+            playerIsDead = 1;
+        }else{
+            timeAlive = Math.abs(oldTimeAlive - timeAlive);
+            oldTimeAlive = oldTimeAlive + timeAlive;
+
         }
-
-
-        timeAlive = timeAlive - oldTimeAlive;
-        oldTimeAlive = oldTimeAlive + timeAlive; 
+            
+     
          
+        
+        System.out.println("New old time " + oldTimeAlive + " new time alive " +timeAlive );
+        
+        
         damageDealt = damageDealt - oldDamageDealt;
         oldDamageDealt = oldDamageDealt + damageDealt;
         
@@ -676,7 +693,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
         
         //calculate score here
-        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken) + (float)(playerIsDead*playerDied) + fitnessBias);
+        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken) - (float)(playerIsDead*playerDied) + fitnessBias);
         
         
         }catch(Exception ex){   
