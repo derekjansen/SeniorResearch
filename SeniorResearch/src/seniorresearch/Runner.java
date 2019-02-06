@@ -179,14 +179,14 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         
         ///LOAD ORGANISM////
         
-//        
-//        FileInputStream openFile = new FileInputStream("mostFitOrganism61.sav");
-//        ObjectInputStream openRestore = new ObjectInputStream(openFile);
-//        Organism savedOrganism = (Organism)openRestore.readObject();
-//        openRestore.close();
-//        
-//        connectionInnovation.setInnocation(savedOrganism.getConnectionGenes().keySet().size());
-//        nodeInnovation.setInnocation(savedOrganism.getNodeGenes().keySet().size());
+        
+        FileInputStream openFile = new FileInputStream("mostFitOrganism95.sav");
+        ObjectInputStream openRestore = new ObjectInputStream(openFile);
+        Organism savedOrganism = (Organism)openRestore.readObject();
+        openRestore.close();
+        
+        connectionInnovation.setInnocation(savedOrganism.getConnectionGenes().keySet().size());
+        nodeInnovation.setInnocation(savedOrganism.getNodeGenes().keySet().size());
         
         
         
@@ -198,7 +198,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
 ///////////////////////EVALUATOR////////////////////////////////////////////////////////
    
         //create evaluator and pass in the starting organism, and the counters for the two types of connections
-        Evaluator eval = new Evaluator(organism, nodeInnovation, connectionInnovation){
+        Evaluator eval = new Evaluator(savedOrganism, nodeInnovation, connectionInnovation){
             @Override
             
             protected float evaluateOrganism(Organism organism){
@@ -224,12 +224,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
                         score = 1f;
                     }
                     
-                    //promote network growth for beginning networks
-                    if(generation < 20){
-                        return organism.getConnectionGenes().size();
-                    }
 
-                    //then begin normal scoring.
                     return score;
                        
                 } catch (Exception ex) {
@@ -245,8 +240,8 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
      
      
      
-        //run for 200 generations and print out scores and such
-        for(int i = 0; i < 150; i++){
+        //run for 100 generations and print out scores and such
+        for(int i = 100; i < 150; i++){
 
             eval.evaluate();
             
@@ -255,14 +250,14 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             
             
             OrganismPrinter printer = new OrganismPrinter();
-            printer.showOrganism(eval.getMostFitOrganism(), "" + i);
+            printer.showOrganism(eval.getHighestOrganismInGeneration(), "" + i);
             
             
                   //save organism or evaluator per whatever generation
             try{
                 FileOutputStream saveFile = new FileOutputStream("mostFitOrganism"+ i  + ".sav");
                 ObjectOutputStream save = new ObjectOutputStream(saveFile);
-                save.writeObject(eval.getMostFitOrganism());
+                save.writeObject(eval.getHighestOrganismInGeneration());
                 save.close();
                 System.out.println("Saved Eval");
             }catch(Exception ex){
@@ -332,7 +327,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             agent_host.startMission( my_mission, my_mission_record); 
         }
         catch (MissionException e) {
-            System.err.println( "Error starting mission: " + e.getMessage() );
+            //System.err.println( "Error starting mission: " + e.getMessage() );
             //System.err.println( "Error code: " + e.getMissionErrorCode() );
             // We can use the code to do specific error handling, eg:
             if (e.getMissionErrorCode() == MissionException.MissionErrorCode.MISSION_INSUFFICIENT_CLIENTS_AVAILABLE)
@@ -361,7 +356,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             try {
                 Thread.sleep(100);
             } catch(InterruptedException ex) {
-                System.err.println( "User interrupted while waiting for mission to start." );
+                //System.err.println( "User interrupted while waiting for mission to start." );
                 return 0;
             }
             world_state = agent_host.getWorldState();
@@ -394,14 +389,6 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
         int floor[] = new int[9]; 
         boolean justDied = false;
     do {
-        agent_host.sendCommand("move 0");
-        agent_host.sendCommand("turn 0");
-        try {
-                Thread.sleep(100);
-        } catch(InterruptedException ex) {
-                System.err.println( "User interrupted while mission was running." );
-                return 0;
-        }
         
         
         //reset to not seen each time
@@ -593,6 +580,24 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             
 
 ///////////////////////////Take output and select the action//////////////////////
+            
+            agent_host.sendCommand("move 0");
+            try {
+                Thread.sleep(50);
+            } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return 0;
+            }
+            agent_host.sendCommand("turn 0");
+            try {
+                Thread.sleep(50);
+            } catch(InterruptedException ex) {
+                System.err.println( "User interrupted while mission was running." );
+                return 0;
+            }
+
+
+
             int selection = 0;
             float score = 0f;
             
@@ -627,7 +632,7 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
             agent_host.sendCommand(outputButtonNames.get(selection));
                         
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch(InterruptedException ex) {
                 System.err.println( "User interrupted while mission was running." );
                 return 0;
@@ -650,7 +655,6 @@ public class Runner implements XmlConversionMethods,FitnessTune,Serializable
 ////////////////////////////////calculate  and return score ///////////////////////////////
         
        int playerIsDead = 0;
-System.out.println("\noldtime " + oldTimeAlive + " life " + life + " time alive " + timeAlive);
        
 //        //player died
 
@@ -667,10 +671,7 @@ System.out.println("\noldtime " + oldTimeAlive + " life " + life + " time alive 
 
         }
             
-     
-         
-        
-        System.out.println("New old time " + oldTimeAlive + " new time alive " +timeAlive );
+    
         
         
         damageDealt = damageDealt - oldDamageDealt;

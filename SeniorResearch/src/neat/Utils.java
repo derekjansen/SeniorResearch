@@ -24,7 +24,7 @@ public interface Utils {
 		int disjointGenes = countDisjointGenes(genome1, genome2);
 		float avgWeightDiff = averageWeightDiff(genome1, genome2);
 		
-		return excessGenes * c1 + disjointGenes * c2 + avgWeightDiff * c3;
+		return (excessGenes * c1)/100 + (disjointGenes * c2)/100 + avgWeightDiff * c3;
 	}
 	
 	public static int countMatchingGenes(Organism genome1, Organism genome2) {

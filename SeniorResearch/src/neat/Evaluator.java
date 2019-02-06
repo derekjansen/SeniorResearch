@@ -39,6 +39,8 @@ public abstract class Evaluator implements Tuning,Serializable{
 	private float highestScore;
 	private int stagnation = 0;
 	private Organism mostFitOrganism;
+        private float highestScoreInGeneration;
+        private Organism highestOrganismInGeneration;
 	
 	public Evaluator(Organism startingOrganism, Counter nodeInnovation, Counter connectionInnovation) {
 		this.nodeInnovation = nodeInnovation;
@@ -57,8 +59,8 @@ public abstract class Evaluator implements Tuning,Serializable{
 	public void evaluate() {
             
                 //reset most fit organism so it finds the most fit per generation
-                highestScore = 0;
-                mostFitOrganism = null;
+                highestScoreInGeneration = 0;
+                highestOrganismInGeneration = null;
             
 		stagnation++;
 		
@@ -120,8 +122,31 @@ public abstract class Evaluator implements Tuning,Serializable{
 				highestScore = score;
 				mostFitOrganism = g;
 			}
+                        
+                        //just for per-generation tracking
+                        if(score > highestScoreInGeneration){
+                           highestScoreInGeneration = score;
+                           highestOrganismInGeneration = g;  
+                        }
+                        
+                        
 		}
 		
+                
+                
+                
+                
+                
+                
+                //MAYBE TRY WITHOUT THIS (below) ELITIST CODE THEN
+                
+                
+                
+                
+                
+                
+                
+                
 		// put best organisms from each species into next generation
 		nextGenOrganisms.add(mostFitOrganism);
 		for (Species s : species) {
@@ -134,6 +159,8 @@ public abstract class Evaluator implements Tuning,Serializable{
 			}
 		}
 		
+                
+                //ALTER THIS CLEANUP METHOD
 		if (stagnation > 40) {
 			System.out.println("CLEANING UPUUUP!");
 			Collections.sort(fitnessOrganisms, fitComp);
@@ -152,6 +179,8 @@ public abstract class Evaluator implements Tuning,Serializable{
 			stagnation = 0;
 		}
 		
+                
+                
 		// Breed the rest of the organisms
 		while (nextGenOrganisms.size() < populationSize) { // replace removed organisms by randomly breeding
 			Species s = getRandomSpeciesBiasedAjdustedFitness(random);
@@ -196,6 +225,8 @@ public abstract class Evaluator implements Tuning,Serializable{
 		nextGenOrganisms = new ArrayList<Organism>();
 	}
 	
+        
+        
         private void removeEmptySpecies() {
 		Iterator<Species> iter = species.iterator();
 		while(iter.hasNext()) {
@@ -264,6 +295,11 @@ public abstract class Evaluator implements Tuning,Serializable{
 		return mostFitOrganism;
 	}
 	
+        public Organism getHighestOrganismInGeneration(){
+            return highestOrganismInGeneration;
+        }
+        
+        
         public List<Organism> getOrganismList(){
             return organisms;
         }

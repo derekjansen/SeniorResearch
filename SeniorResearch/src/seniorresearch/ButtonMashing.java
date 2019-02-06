@@ -21,14 +21,22 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
     static double oldDamageDealt = 0;
     static float oldTimeAlive = 0;
     
-    static
+    
+     static
     {        
         System.load("/Users/derekgrove/Desktop/Malmo/Java_Examples/libMalmoJava.jnilib"); 
     }
     
+    static MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
+    static AgentHost agent_host = new AgentHost();
+    static String missionXmlString = createMissionString(0);
+    static MissionSpec my_mission;
+    
+   
+    
     public static void main(String argv[]) throws Exception
     {
-        
+        my_mission = new MissionSpec(missionXmlString, true);
         //Set up stream to print to
        // PrintStream out = new PrintStream(new FileOutputStream("buttonMashingData.txt", true), true);
        // System.setOut(out);
@@ -64,15 +72,6 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
     static private float runOrganism() throws Exception{
         try{
          ///////////////////////////////////// SET UP THE WORLD AND THE MALMO AGENT /////////////////////////////////
-        
-        AgentHost agent_host = new AgentHost();
-
-        
-        String missionXmlString = createMissionString(0);
-        MissionSpec my_mission = new MissionSpec(missionXmlString, true);
-      
-        MissionRecordSpec my_mission_record = new MissionRecordSpec("./saved_data.tgz");
-        
         
         boolean success = true;
         
@@ -137,19 +136,6 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
         ////////////////////////// MAIN LOOP ///////////////////////////////////// 
         
         
-        
-        
-        
-        //pause on daylight for a bit
-        try {
-                Thread.sleep(20000);
-            } catch(InterruptedException ex) {
-                System.err.println( "User interrupted while mission was running." );
-                return 0;
-            }
-        agent_host.sendCommand("chat /tp 4 228 4");
-        //turn to night
-        agent_host.sendCommand("chat /time set 15000");
         //Spawn zombie in the corner
         agent_host.sendCommand("chat /summon zombie 11 228 11 {IsBaby:0}");
         
@@ -235,16 +221,20 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
         
        // System.out.println( "Mission has stopped." );
        
-       
+       int playerIsDead = 1;
         //player died
-        if(life == 0){
-            oldTimeAlive = 0;
+        if(life == 0 && oldTimeAlive < 1000){
+            oldTimeAlive = 0; //reset
+            playerIsDead = 1;
+        }else if(life == 0){
+            timeAlive = Math.abs(oldTimeAlive - timeAlive);
+            oldTimeAlive = 0; //reset
+            playerIsDead = 1;
+        }else{
+            timeAlive = Math.abs(oldTimeAlive - timeAlive);
+            oldTimeAlive = oldTimeAlive + timeAlive;
+
         }
-       
-        
-        //logic makes sense in theory...
-        timeAlive = timeAlive - oldTimeAlive;
-        oldTimeAlive = oldTimeAlive + timeAlive; 
        
         damageDealt = damageDealt - oldDamageDealt;
         oldDamageDealt = oldDamageDealt + damageDealt;
@@ -261,7 +251,7 @@ public class ButtonMashing implements XmlConversionMethods,FitnessTune
         agent_host.sendCommand("quit");
       
         //calulate score here
-        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken));
+        return ((timeReward * timeAlive) + (damageDealtReward * (float)damageDealt) + (zombiesKilledReward * mobKilled) - (damageRecievedReward * (float)damageTaken) - (float)(playerIsDead*playerDied) + fitnessBias);
         }catch(Exception ex){   
             
             System.out.println("\n THERE WAS A BIG OL ERROR  \n");
